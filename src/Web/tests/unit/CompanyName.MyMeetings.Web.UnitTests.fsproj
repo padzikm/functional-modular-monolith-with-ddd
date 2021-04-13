@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Library.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Fable.FastCheck.Jest" Version="0.32.0" />
+    <PackageReference Include="Fable.Jester" Version="0.32.0" />
+    <PackageReference Include="Fable.ReactTestingLibrary" Version="0.32.0" />
+    <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CompanyName.MyMeetings.Web.fsproj" />
+  </ItemGroup>
+
+</Project>
