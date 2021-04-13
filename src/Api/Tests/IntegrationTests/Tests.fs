@@ -19,49 +19,12 @@ open Xunit.Abstractions
 let options = JsonSerializerOptions()
 options.Converters.Add(JsonFSharpConverter())
 
-[<Fact>]
-let ``My test`` () =
-    Assert.True(true)
-    
-[<Fact>]
-let ``Fsunit test`` () =
-    1 |> should equal 1
-
 let serverFactory = new WebApplicationFactory<Startup>()
 
-type Tmp = {
-    raz: int
-    dwa: string
-    trzy: ResizeArray<bool>
-}
-
-type Ta = {
-    raz: int
-    trzy: ResizeArray<bool>
-}
-
-type C = {
-    id: Guid
-}
-
-type Bla (output: ITestOutputHelper) =
+type Tests (output: ITestOutputHelper) =
     
     [<Fact>]
     let ``get nonexistent meeting returns not found`` () =
-        (*let t = {
-            raz = 5
-            dwa = "testowy"
-            trzy = new ResizeArray<bool>([
-                false
-                true
-            ])
-        }
-        let s = JsonSerializer.Serialize(t)
-        output.WriteLine(s)
-        let d = JsonSerializer.Deserialize<Ta>(s)
-        output.WriteLine(d.raz.ToString())
-        output.WriteLine(d.trzy.[0].ToString())
-        output.WriteLine(d.trzy.[1].ToString())*)
         let client = serverFactory.CreateClient()
         async {
             let g = Guid.NewGuid()
@@ -69,10 +32,6 @@ type Bla (output: ITestOutputHelper) =
             let! value = client.GetAsync(uri) |> Async.AwaitTask
             let! res = value.Content.ReadAsStringAsync() |> Async.AwaitTask
             output.WriteLine(res)
-            //let dd = JsonSerializer.Deserialize<C>(res)
-            //output.WriteLine(dd.id.ToString())
-            //dd.id |> should equal g
-            //value.IsSuccessStatusCode |> should equal true
             value.StatusCode |> should equal HttpStatusCode.NotFound
         }
         
@@ -83,7 +42,6 @@ type Bla (output: ITestOutputHelper) =
             let data = {|
                 MeetingGroupId = Guid.NewGuid()
                 Title = "test"
-                //AttendeesLimit = None
             |}
             let uri = $"/meetings"
             let json = JsonContent.Create(data)
@@ -97,20 +55,6 @@ type Bla (output: ITestOutputHelper) =
         
     [<Fact>]
     let ``get existing meeting returns ok`` () =
-        (*let t = {
-            raz = 5
-            dwa = "testowy"
-            trzy = new ResizeArray<bool>([
-                false
-                true
-            ])
-        }
-        let s = JsonSerializer.Serialize(t)
-        output.WriteLine(s)
-        let d = JsonSerializer.Deserialize<Ta>(s)
-        output.WriteLine(d.raz.ToString())
-        output.WriteLine(d.trzy.[0].ToString())
-        output.WriteLine(d.trzy.[1].ToString())*)
         let client = serverFactory.CreateClient()
         async {
             let g = Guid.Parse("EA0231DF-12A7-475C-A1B1-53F9EF0297B7")
@@ -118,10 +62,6 @@ type Bla (output: ITestOutputHelper) =
             let! value = client.GetAsync(uri) |> Async.AwaitTask
             let! res = value.Content.ReadAsStringAsync() |> Async.AwaitTask
             output.WriteLine(res)
-            //let dd = JsonSerializer.Deserialize<C>(res)
-            //output.WriteLine(dd.id.ToString())
-            //dd.id |> should equal g
-            //value.IsSuccessStatusCode |> should equal true
             value.IsSuccessStatusCode |> should equal true
         }
 
@@ -138,9 +78,7 @@ type Bla (output: ITestOutputHelper) =
             let dd = JsonSerializer.Deserialize<EditMeetingRequest>(d, options)
             output.WriteLine(d)
             let uri = $"/meetings/{id.ToString()}"
-            //let j = JsonContent.Create(d)
             let str = new StringContent(d, Encoding.UTF8, "application/json")
-            //let json = JsonContent.Create(data)
             let! s = str.ReadAsStringAsync() |> Async.AwaitTask
             output.WriteLine(s)
             let! res = client.PutAsync(uri, str) |> Async.AwaitTask
@@ -162,9 +100,7 @@ type Bla (output: ITestOutputHelper) =
             let dd = JsonSerializer.Deserialize<EditMeetingRequest>(d, options)
             output.WriteLine(d)
             let uri = $"/meetings/{id.ToString()}"
-            //let j = JsonContent.Create(d)
             let str = new StringContent(d, Encoding.UTF8, "application/json")
-            //let json = JsonContent.Create(data)
             let! s = str.ReadAsStringAsync() |> Async.AwaitTask
             output.WriteLine(s)
             let! res = client.PutAsync(uri, str) |> Async.AwaitTask

@@ -1,10 +1,6 @@
 module CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Domain.Meetings.MeetingsDbContext
 
-open System
-open System.Data.SqlClient
-open CompanyName.MyMeetings.Modules.Meetings.Domain.Meetings
 open Microsoft.EntityFrameworkCore
-open Dapper
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Domain.Meetings.MeetingsDbModel
 
 type MeetingsDbContext(connectionString: string) =

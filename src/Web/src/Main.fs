@@ -9,5 +9,5 @@ importSideEffects "./styles/global.scss"
 
 ReactDOM.render(
     Components.Router(),
-    document.getElementById "feliz-app"
+    document.getElementById "app"
 )
