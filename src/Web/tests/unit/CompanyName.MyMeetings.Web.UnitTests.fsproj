@@ -19,4 +19,8 @@
     <ProjectReference Include="..\..\src\CompanyName.MyMeetings.Web.fsproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="httpStubs\test.js" />
+  </ItemGroup>
+
 </Project>

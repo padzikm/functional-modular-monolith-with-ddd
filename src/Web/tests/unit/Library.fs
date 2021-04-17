@@ -5,12 +5,42 @@ open Fable.ReactTestingLibrary
 open Fable.FastCheck
 open Fable.FastCheck.Jest
 open App
+open Fable.Core
+open Fable.Core.JsInterop
+
+type HttpStub = {
+    listen: unit -> unit
+    close: unit -> unit
+    reset: unit -> unit
+}
+    
+
+[<Import("httpStub", "./httpStubs/test")>]
+let httpStub: HttpStub = jsNative
+
+Jest.beforeAll(fun _ -> httpStub.listen())
+Jest.afterEach(fun _ -> httpStub.reset())
+Jest.afterAll(fun _ -> httpStub.close())
 
 Jest.test("test jest", fun () ->
     let v = 2* 2
     printfn "Hello %d" v
     Jest.expect(v).toBe(4)
     )
+
+Jest.test("http test", promise {
+    let c = Components.Counter()
+    let _ = RTL.render(c)
+    Jest.expect(RTL.screen.getByRole("button")).toHaveTextContent("Increment")
+    do! RTL.waitFor(fun () -> Jest.expect(RTL.screen.getByRole("heading")).toHaveTextContent("-1"))
+    })
+
+Jest.test("http test2", promise {
+    let c = Components.Counter()
+    let _ = RTL.render(c)
+    Jest.expect(RTL.screen.getByRole("button")).toHaveTextContent("Increment")
+    do! RTL.waitFor(fun () -> Jest.expect(RTL.screen.getByRole("heading")).toHaveTextContent("-1"))
+    })
 
 Jest.test("rtl test", fun () ->
     let c = Components.HelloWorld()

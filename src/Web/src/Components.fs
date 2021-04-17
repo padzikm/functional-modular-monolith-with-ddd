@@ -41,9 +41,10 @@ type Components =
             let u = "/api/meetings/EA0231DF-12A7-475C-A1B1-53F9EF0297B7"
             let! r = Fetch.get<_, GetMeetingDetails>(u, properties = [RequestProperties.Mode RequestMode.Cors], caseStrategy = CamelCase) |> Async.AwaitPromise
             printfn $"from api {r.Id} - {r.Title}"
+            setCount(-1);
             return r
         }
-        //f |> Async.StartAsPromise |> ignore
+        f |> Async.StartAsPromise |> ignore
 //        let ap = async {
 //            return! Fetch.fetch url [] |> Async.AwaitPromise
 //        }
