@@ -1,7 +1,18 @@
 namespace App
 
+open System
+open Fable.Import
 open Feliz
 open Feliz.Router
+open Fable.Core
+open Fetch
+open Thoth.Fetch
+open Thoth.Json
+
+type GetMeetingDetails = {
+            Id: Guid
+            Title: string
+        }
 
 type Components =
     /// <summary>
@@ -17,6 +28,25 @@ type Components =
     [<ReactComponent>]
     static member Counter() =
         let (count, setCount) = React.useState(0)
+        let a = async {
+            let t = 3
+            printfn $"w async {t}"
+            return t + 1
+        }
+        
+        let p = Async.StartAsPromise a
+        p.``then``(fun v -> printfn $"wartosc {v}") |> ignore
+        let url = "https://jsonplaceholder.typicode.com/todos/1"
+        let f = async {
+            let u = "/api/meetings/EA0231DF-12A7-475C-A1B1-53F9EF0297B7"
+            let! r = Fetch.get<_, GetMeetingDetails>(u, properties = [RequestProperties.Mode RequestMode.Cors], caseStrategy = CamelCase) |> Async.AwaitPromise
+            printfn $"from api {r.Id} - {r.Title}"
+            return r
+        }
+        //f |> Async.StartAsPromise |> ignore
+//        let ap = async {
+//            return! Fetch.fetch url [] |> Async.AwaitPromise
+//        }
         Html.div [
             Html.h1 count
             Html.button [

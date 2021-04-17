@@ -13,12 +13,13 @@ open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 
+
 type Startup(configuration: IConfiguration) =
     member _.Configuration = configuration
 
     // This method gets called by the runtime. Use this method to add services to the container.
     member _.ConfigureServices(services: IServiceCollection) =
-        // Add framework services.
+        services.AddCors() |> ignore
         services.AddControllers().AddJsonOptions(fun options -> options.JsonSerializerOptions.Converters.Add(JsonFSharpConverter())) |> ignore
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -26,6 +27,7 @@ type Startup(configuration: IConfiguration) =
         if (env.IsDevelopment()) then
             app.UseDeveloperExceptionPage() |> ignore
         //app.UseHttpsRedirection()
+        app.UseCors(fun a -> a.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin() |> ignore) |> ignore
         app.UseRouting()
            .UseAuthorization()
            .UseEndpoints(fun endpoints ->

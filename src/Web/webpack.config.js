@@ -29,7 +29,7 @@ var CONFIG = {
         '/api': {
             target: "http://localhost:5000",
             pathRewrite: { '^/api': '' },
-            //changeOrigin: true
+            changeOrigin: true
         }
     },
     // Use babel-preset-env to generate JS compatible with most-used browsers.
@@ -118,7 +118,7 @@ module.exports = {
         publicPath: "/",
         contentBase: resolve(CONFIG.assetsDir),
         port: CONFIG.devServerPort,
-        //proxy: CONFIG.devServerProxy,
+        proxy: CONFIG.devServerProxy,
         hot: true,
         inline: true
     },

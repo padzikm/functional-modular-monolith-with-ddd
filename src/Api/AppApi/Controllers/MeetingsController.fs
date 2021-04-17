@@ -34,7 +34,7 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
 
     member private this.badRequest(ex: Exception) =
         this.BadRequest(ex.ToString()) :> ActionResult
-
+    
     [<HttpGet("{id}")>]
     member this.GetMeetingDetails(id: Guid) =
         let query : GetMeetingDetailsQuery = GetMeetingDetailsQuery(id)
