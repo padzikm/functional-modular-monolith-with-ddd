@@ -3,6 +3,7 @@
   "scripts": {
     "prestart": "dotnet tool restore",
     "start": "dotnet fable watch ./src -s --run webpack-dev-server",
+    "devserver": "webpack-dev-server",
     "prebuild": "dotnet tool restore",
     "build": "dotnet fable ./src && webpack",
     "test:live": "dotnet fable tests --run webpack-dev-server --config ./webpack.tests.js",

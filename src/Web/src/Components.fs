@@ -8,6 +8,7 @@ open Fable.Core
 open Fetch
 open Thoth.Fetch
 open Thoth.Json
+open CompanyName.MyMeetings.Web.MeetingDetails
 
 type GetMeetingDetails = {
             Id: Guid
@@ -70,6 +71,7 @@ type Components =
                 | [ ] -> Html.h1 "Index"
                 | [ "hello" ] -> Components.HelloWorld()
                 | [ "counter" ] -> Components.Counter()
+                | [ "meeting" ] -> DisplayMeetingDetails (Guid.NewGuid())
                 | otherwise -> Html.h1 "Not found"
             ]
         ]

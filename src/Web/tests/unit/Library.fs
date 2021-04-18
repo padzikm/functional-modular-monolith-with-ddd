@@ -1,4 +1,4 @@
-﻿module CompanyName.MyMeetings.Web.UnitTests
+﻿module CompanyName.MyMeetings.Web.UnitTests.Tmp
 
 open Fable.Jester
 open Fable.ReactTestingLibrary

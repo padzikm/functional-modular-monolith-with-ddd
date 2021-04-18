@@ -9,7 +9,7 @@ type CreateMeetingCommand = {
     AttendeesLimit: int option
 }
 
-let executeCommand (saveMeeting: Meeting -> Result<_,_>) command =
+let executeCommand (saveMeeting: Meeting -> Async<Result<_,_>>) command =
     let meeting: Meeting = {
         MeetingId = MeetingId(Guid.NewGuid())
         Title = command.Title

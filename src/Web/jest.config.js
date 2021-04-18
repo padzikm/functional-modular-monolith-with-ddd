@@ -128,7 +128,7 @@ module.exports = {
   setupFiles: ['<rootDir>/tests/env-setup.js'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['<rootDir>/tests/jest-setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/tests/jest-setup.js', '<rootDir>/tests/server-setup.js'],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,
