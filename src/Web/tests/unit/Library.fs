@@ -7,6 +7,7 @@ open Fable.FastCheck.Jest
 open App
 open Fable.Core
 open Fable.Core.JsInterop
+open CompanyName.MyMeetings.Web.App
 
 type HttpStub = {
     listen: unit -> unit
@@ -21,6 +22,13 @@ let httpStub: HttpStub = jsNative
 Jest.beforeAll(fun _ -> httpStub.listen())
 Jest.afterEach(fun _ -> httpStub.reset())
 Jest.afterAll(fun _ -> httpStub.close())
+
+Jest.test("counter", fun () ->
+    let s = {Count = 5}
+    let d _ = ()
+    RTL.render(render s d) |> ignore
+    Jest.expect(RTL.screen.getByRole("heading")).toHaveTextContent(s.Count.ToString())
+    )
 
 Jest.test("test jest", fun () ->
     let v = 2* 2
