@@ -7,11 +7,16 @@
         <Compile Include="Extensions.fs" />
         <Compile Include="MeetingDetails\DisplayMeetingDetails.fs" />
         <Compile Include="Components.fs" />
+        <Compile Include="App.fs" />
         <Compile Include="Main.fs" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Fable.Browser.Geolocation" Version="1.0.0" />
         <PackageReference Include="Fable.Browser.Url" Version="1.0.0" />
+        <PackageReference Include="Fable.Elmish.Browser" Version="3.0.4" />
+        <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
+        <PackageReference Include="Fable.Elmish.HMR" Version="4.1.0" />
+        <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
         <PackageReference Include="Fable.Reaction" Version="3.5.0" />
         <PackageReference Include="Feliz" Version="1.42.0" />
         <PackageReference Include="Feliz.Router" Version="3.8.0" />
