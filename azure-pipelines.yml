@@ -7,7 +7,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  MeetingsConnectionString: "test-conn"
 
 steps:
 - task: DotNetCoreCLI@2
@@ -28,4 +27,6 @@ steps:
     command: test
     projects: src/CompanyName.MyMeetings.sln
     arguments: '--configuration $(buildConfiguration)'
+  env:
+    MeetingsConnectionString: "Server=(localdb)\\mssqllocaldb;Database=ModularMonolith;Trusted_Connection=True;"
   displayName: 'dotnet test $(buildConfiguration)'
