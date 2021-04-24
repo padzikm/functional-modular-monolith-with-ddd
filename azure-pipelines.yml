@@ -28,7 +28,7 @@ steps:
   inputs:
     command: restore
     workingDirectory: "$(System.DefaultWorkingDirectory)/src"
-    projects: "CompanyName.MyMeetings.sln"
+    projects: CompanyName.MyMeetings.sln
 
 - task: DotNetCoreCLI@2
   inputs:
