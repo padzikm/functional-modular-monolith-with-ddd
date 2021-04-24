@@ -9,6 +9,21 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- script: pwd
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- script: ls -al
+  workingDirectory: $(System.DefaultWorkingDirectory)
+
+- script: ls -al
+  workingDirectory: $(System.DefaultWorkingDirectory)/src
+
+- script: ls -al
+  workingDirectory: '$(System.DefaultWorkingDirectory)/src'
+
+- script: ls -al
+  workingDirectory: "$(System.DefaultWorkingDirectory)/src"
+
 - task: DotNetCoreCLI@2
   inputs:
     command: restore
@@ -28,5 +43,5 @@ steps:
     command: test
     workingDirectory: "$(System.DefaultWorkingDirectory)/src"
     #projects: 'CompanyName.MyMeetings.sln'
-    arguments: '--configuration $(buildConfiguration)'
-  displayName: 'dotnet test $(buildConfiguration)'
+    #arguments: '--configuration $(buildConfiguration)'
+  #displayName: 'dotnet test $(buildConfiguration)'
