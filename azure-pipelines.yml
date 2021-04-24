@@ -37,6 +37,12 @@ jobs:
 
 - job: frontend
   steps:
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: restore
+      projects: src/CompanyName.MyMeetings.sln
+    displayName: 'dotnet restore'
   
   - task: NodeTool@0
     inputs:
