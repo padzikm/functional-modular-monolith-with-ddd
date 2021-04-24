@@ -34,7 +34,7 @@ steps:
   inputs:
     command: build
     workingDirectory: "$(System.DefaultWorkingDirectory)/src"
-    projects: CompanyName.MyMeetings.sln
+    projects: ./CompanyName.MyMeetings.sln
     arguments: '--configuration $(buildConfiguration)'
   displayName: 'dotnet build $(buildConfiguration)'
 
