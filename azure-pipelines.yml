@@ -28,5 +28,5 @@ steps:
     projects: src/CompanyName.MyMeetings.sln
     arguments: '--configuration $(buildConfiguration)'
   env:
-    MeetingsConnectionString: "Server=(localdb)\\mssqllocaldb;Database=ModularMonolith;Trusted_Connection=True;"
+    MeetingsConnectionString: "Server=localhost;Database=MyMeetings;User Id=sa;Password=test;"
   displayName: 'dotnet test $(buildConfiguration)'
