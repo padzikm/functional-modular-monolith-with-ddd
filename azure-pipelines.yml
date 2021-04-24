@@ -12,13 +12,13 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: restore
-    workingDirectory: ./src
+    workingDirectory: "$(System.DefaultWorkingDirectory)/src"
     projects: '*.sln'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: build
-    workingDirectory: ./src
+    workingDirectory: "$(System.DefaultWorkingDirectory)/src"
     projects: '*.sln'
     arguments: '--configuration $(buildConfiguration)'
   displayName: 'dotnet build $(buildConfiguration)'
@@ -26,7 +26,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: test
-    workingDirectory: ./src
+    workingDirectory: "$(System.DefaultWorkingDirectory)/src"
     projects: '*.sln'
     arguments: '--configuration $(buildConfiguration)'
   displayName: 'dotnet test $(buildConfiguration)'
