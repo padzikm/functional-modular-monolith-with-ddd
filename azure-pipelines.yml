@@ -8,25 +8,57 @@ pool:
 variables:
   buildConfiguration: 'Release'
 
-steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: restore
-    projects: src/CompanyName.MyMeetings.sln
-  displayName: 'dotnet restore'
+jobs:
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: build
-    projects: src/CompanyName.MyMeetings.sln
-    arguments: '--configuration $(buildConfiguration)'
-  displayName: 'dotnet build $(buildConfiguration)'
+- job: backend
+  steps:
+  
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: restore
+      projects: src/CompanyName.MyMeetings.sln
+    displayName: 'dotnet restore'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: test
-    projects: src/CompanyName.MyMeetings.sln
-    arguments: '--configuration $(buildConfiguration)'
-  env:
-    MeetingsConnectionString: "Server=localhost;Database=MyMeetings;User Id=sa;Password=test;"
-  displayName: 'dotnet test $(buildConfiguration)'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: build
+      projects: src/CompanyName.MyMeetings.sln
+      arguments: '--configuration $(buildConfiguration)'
+    displayName: 'dotnet build $(buildConfiguration)'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: test
+      projects: src/CompanyName.MyMeetings.sln
+      arguments: '--configuration $(buildConfiguration)'
+    env:
+      MeetingsConnectionString: "Server=localhost;Database=MyMeetings;User Id=sa;Password=test;"
+    displayName: 'dotnet test $(buildConfiguration)'
+
+- job: frontend
+  steps:
+  
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '14.x'
+  
+  - task: Bash@3
+    inputs:
+      targetType: inline
+      workingDirectory: src/Web
+      script: yarn install
+    displayName: yarn install
+  
+  - task: Bash@3
+    inputs:
+      targetType: inline
+      workingDirectory: src/Web
+      script: yarn build
+    displayName: yarn build
+
+  - task: Bash@3
+    inputs:
+      targetType: inline
+      workingDirectory: src/Web
+      script: yarn test:unit
+    displayName: yarn test
