@@ -27,14 +27,14 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: restore
-    #workingDirectory: "$(System.DefaultWorkingDirectory)/src"
-    projects: 'src/CompanyName.MyMeetings.sln'
+    workingDirectory: "$(System.DefaultWorkingDirectory)/src"
+    projects: "CompanyName.MyMeetings.sln"
 
 - task: DotNetCoreCLI@2
   inputs:
     command: build
-    #workingDirectory: "$(System.DefaultWorkingDirectory)/src"
-    projects: 'src/CompanyName.MyMeetings.sln'
+    workingDirectory: "$(System.DefaultWorkingDirectory)/src"
+    projects: CompanyName.MyMeetings.sln
     arguments: '--configuration $(buildConfiguration)'
   displayName: 'dotnet build $(buildConfiguration)'
 
@@ -42,6 +42,6 @@ steps:
   inputs:
     command: test
     workingDirectory: "$(System.DefaultWorkingDirectory)/src"
-    #projects: 'CompanyName.MyMeetings.sln'
+    projects: 'CompanyName.MyMeetings.sln'
     #arguments: '--configuration $(buildConfiguration)'
   #displayName: 'dotnet test $(buildConfiguration)'
