@@ -67,7 +67,7 @@ jobs:
     inputs:
       key: 'yarn | "$(Agent.OS)" | src/Web/yarn.lock'
       path: src/Web/node_modules
-    displayName: cache node_modules
+    displayName: cache npm
   
   - task: Bash@3
     inputs:
