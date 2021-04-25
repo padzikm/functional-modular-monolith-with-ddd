@@ -8,7 +8,9 @@
     <Compile Include="Library.fs" />
     <Compile Include="GetMeetingDetails.fs" />
   </ItemGroup>
-
+  <PropertyGroup>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Fable.FastCheck.Jest" Version="0.32.0" />
     <PackageReference Include="Fable.Jester" Version="0.32.0" />

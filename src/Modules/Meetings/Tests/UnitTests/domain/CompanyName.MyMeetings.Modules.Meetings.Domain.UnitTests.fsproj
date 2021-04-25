@@ -6,7 +6,9 @@
     <IsPackable>false</IsPackable>
     <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />

@@ -4,7 +4,9 @@
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>09a2f48a-efe2-4f8e-81cd-787ae22a8e9d</UserSecretsId>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Controllers\MeetingsController.fs" />
     <Compile Include="Startup.fs" />

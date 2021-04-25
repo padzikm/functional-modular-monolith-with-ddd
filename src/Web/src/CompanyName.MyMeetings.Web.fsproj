@@ -2,6 +2,9 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
+    <PropertyGroup>
+        <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    </PropertyGroup>
     <ItemGroup>
         <None Include="index.html" />
         <Compile Include="Extensions.fs" />

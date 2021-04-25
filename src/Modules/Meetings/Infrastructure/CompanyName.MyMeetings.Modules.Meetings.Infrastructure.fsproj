@@ -3,7 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="Domain\Meetings\MeetingsDbModel.fs" />
     <Compile Include="Domain\Meetings\MeetingsDbContext.fs" />
