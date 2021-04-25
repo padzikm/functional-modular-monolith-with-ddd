@@ -31,14 +31,14 @@ jobs:
     inputs:
       command: build
       projects: src/CompanyName.MyMeetings.sln
-      arguments: '--configuration $(buildConfiguration)'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
     displayName: 'dotnet build $(buildConfiguration)'
 
   - task: DotNetCoreCLI@2
     inputs:
       command: test
       projects: src/CompanyName.MyMeetings.sln
-      arguments: '--configuration $(buildConfiguration)'
+      arguments: '--no-restore --configuration $(buildConfiguration)'
     env:
       MeetingsConnectionString: "Server=localhost;Database=MyMeetings;User Id=sa;Password=test;"
     displayName: 'dotnet test $(buildConfiguration)'
