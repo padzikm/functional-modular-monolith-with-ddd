@@ -10,6 +10,7 @@
     <Compile Include="Meetings\GetMeetingDetails.fs" />
     <Compile Include="Meetings\CreateMeeting.fs" />
     <Compile Include="Meetings\EditMeeting.fs" />
+    <None Include="free.fsx" />
   </ItemGroup>
 
   <ItemGroup>
