@@ -60,7 +60,6 @@ let rec interpret (p: Program<'A>) =
         | InR file -> match file with
             | ReadFile (f, n) ->
                 let s = File.ReadAllText f
-                let fs = $"fake file content from file {f}"
                 interpret (n s)
             | WriteFile (f,c,a) ->
                 File.WriteAllText(f, c)

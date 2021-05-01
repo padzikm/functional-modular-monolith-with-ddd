@@ -12,6 +12,7 @@
     <Compile Include="Meetings\EditMeeting.fs" />
     <None Include="free.fsx" />
     <None Include="freeplus.fsx" />
+    <None Include="freestackplus.fsx" />
     <None Include="freestack.fsx" />
   </ItemGroup>
 
