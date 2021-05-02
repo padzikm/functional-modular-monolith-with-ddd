@@ -50,24 +50,9 @@ let writentity i e : Program<_> = Free.liftF(InL(WriteEntity(i, e, ())))
 
 let program =
     monad {
-        do! writeline "podaj id encji"
-        let! s = readline
-        let! e = readentity s
-        do! writeline(sprintf "wczytano %A" e)
-        do! writeline "podaj nowe imie"
-        let! n = readline
-        let ne = { e with name = n }
-        do! writentity s ne
-        do! writeline "zapisano"
-        do! writeline "podaj nazwe pliku"
-        let! f = readline
-        let! ee = readentity s
-        let c = sprintf "%A" ee
-        do! writeline $"zapisuje {c} do pliku"
-        do! writefile f c
-        do! writeline $"zapisano do pliku {f}:"
-        let! fc = readfile f
-        do! writeline fc
+        do! writeline "stack overflow test"
+        for i=1 to 100000 do
+            do! writeline "bla"
     }
 
 let interpretConsole (p: CommandLineInstruction<_>) =
