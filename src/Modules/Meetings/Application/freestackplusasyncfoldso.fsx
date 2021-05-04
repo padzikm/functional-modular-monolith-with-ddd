@@ -55,6 +55,7 @@ let program =
             do! writeline "bla"
     }
 
+let mutable i = 0
 let interpretConsole (p: CommandLineInstruction<_>) =
     match p with
     | ReadLine f ->
@@ -65,8 +66,11 @@ let interpretConsole (p: CommandLineInstruction<_>) =
         }
     | WriteLine (s, a) ->
 //        printfn $"writeline {s}"
+        printfn $"writeline {i}"
         async {
-            do System.Console.WriteLine(s)
+            printfn $"writeline {i}"
+            i <- i + 1
+            System.Console.WriteLine(s)
             return a
         }
 
