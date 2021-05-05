@@ -16,6 +16,8 @@
     <None Include="freestackplus.fsx" />
     <None Include="freestackplusasync.fsx" />
     <None Include="freestackplusasyncfold.fsx" />
+    <None Include="freestackplusasyncfoldtrans.fsx" />
+    <None Include="monadtrans.fsx" />
     <None Include="freestackplusasyncfoldso.fsx" />
     <None Include="freestackplusasyncso.fsx" />
     <None Include="freestack.fsx" />
