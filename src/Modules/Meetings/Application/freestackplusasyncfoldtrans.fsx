@@ -48,43 +48,42 @@ let writefile f c : Program<_> = Free.liftF(InR(InR(WriteFile(f, c, ()))))
 let readentity i : Program<_> = Free.liftF(InL(ReadEntity(i, id)))
 let writentity i e : Program<_> = Free.liftF(InL(WriteEntity(i, e, ())))
 
-let optT (opt: OptionT<Result<DbRecord option, exn>>) =
+let optT nn (opt: OptionT<Result<DbRecord option, exn>>) =
     monad {
-        printfn "w monad"
-        printfn "%A" opt
         let! v = opt
-        printfn "wartosc"
-        printfn "%A" v
-    }// |> OptionT.run
+        return {v with name = nn}
+    }
     
 let program =
     monad {
         do! writeline "podaj id encji"
         let! s = readline
         let! e = readentity s
-        let ort = monad {
-            let! b = optT e
-            //return writeline (sprintf "%A" b)
-            printfn "opt"
-            printfn "%A" b
-        }
-        //do! writeline(sprintf "wczytano %A" e)
+        do! writeline(sprintf "wczytano %A" e)
         do! writeline "podaj nowe imie"
-        return "bla"
-//        let! n = readline
-//        let ne = { e with name = n }
-//        do! writentity s ne
-//        do! writeline "zapisano"
-//        do! writeline "podaj nazwe pliku"
-//        let! f = readline
-//        let! ee = readentity s
-//        let c = sprintf "%A" ee
-//        do! writeline $"zapisuje {c} do pliku"
-//        do! writefile f c
-//        do! writeline $"zapisano do pliku {f}:"
-//        let! fc = readfile f
-//        do! writeline fc
-//        return fc
+        let! n = readline
+        let ort = monad {
+            let! b = optT n e
+            monad {
+                do! writeline "opt trans"
+                do! writeline (sprintf "z opt %A" b)
+                do! writentity s b
+                let! rs = readline
+                let ne = {b with name = $"{rs} plus"}
+                do! writentity s ne
+                do! writeline "zapisano"
+                do! writeline "podaj nazwe pliku"
+                let! f = readline
+                let! ee = readentity s
+                let c = sprintf "%A" ee
+                do! writeline $"zapisuje {c} do pliku"
+                do! writefile f c
+                do! writeline $"zapisano do pliku {f}:"
+                let! fc = readfile f
+                do! writeline fc
+            }
+        }
+        return! ort |> OptionT.run |> Result.defaultValue None |> Option.defaultValue (Pure ())
     }
 
 type TestStateDb = {
@@ -119,7 +118,7 @@ let interpretConsoleTest (p: CommandLineInstruction<_>) : State<_,_> =
             | [] ->
                 let ns = {s with ReadLines = []}
                 do! State.put ns
-                return f ""
+                return f "pusto"
             | h::t ->
                 let ns = {s with ReadLines = t}
                 do! State.put ns
