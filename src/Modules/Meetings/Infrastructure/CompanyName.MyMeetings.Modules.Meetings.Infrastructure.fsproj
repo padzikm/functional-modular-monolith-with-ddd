@@ -11,7 +11,10 @@
     <Compile Include="Domain\Meetings\MeetingsDbContext.fs" />
     <Compile Include="Domain\Meetings\MeetingsRepository.fs" />
     <Compile Include="Domain\Meetings\MeetingEntityTypeConfiguration.fs" />
+    <Compile Include="Domain\Members.fs" />
     <Compile Include="MeetingsModule.fs" />
+    <Compile Include="Interpreters\CreateMember.fs" />
+    <Compile Include="MeetingsContext.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1199,6 +1199,12 @@
           "FsToolkit.ErrorHandling": "2.1.2"
         }
       },
+      "companyname.mymeetings.buildingblocks.domain": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "5.0.0"
+        }
+      },
       "companyname.mymeetings.modules.meetings.application": {
         "type": "Project",
         "dependencies": {
@@ -1213,6 +1219,7 @@
       "companyname.mymeetings.modules.meetings.domain": {
         "type": "Project",
         "dependencies": {
+          "CompanyName.MyMeetings.BuildingBlocks.Domain": "1.0.0",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
           "FsToolkit.ErrorHandling": "2.1.2"

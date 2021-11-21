@@ -15,6 +15,7 @@
     <None Include="freepluscont.fsx" />
     <None Include="freestackplus.fsx" />
     <None Include="freestackplusasync.fsx" />
+    <Compile Include="CreateMember.fs" />
     <None Include="freestackplusasyncfold.fsx" />
     <None Include="freestackplusasyncfoldtrans.fsx" />
     <None Include="freestackplusasyncfoldtransstate.fsx" />
@@ -22,6 +23,7 @@
     <None Include="freestackplusasyncfoldso.fsx" />
     <None Include="freestackplusasyncso.fsx" />
     <None Include="freestack.fsx" />
+    <Compile Include="Members\CreateMember\Handler.fs" />
   </ItemGroup>
 
   <ItemGroup>

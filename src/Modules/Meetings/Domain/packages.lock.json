@@ -25,6 +25,12 @@
         "dependencies": {
           "FSharp.Core": "4.6.2"
         }
+      },
+      "companyname.mymeetings.buildingblocks.domain": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "5.0.0"
+        }
       }
     }
   }

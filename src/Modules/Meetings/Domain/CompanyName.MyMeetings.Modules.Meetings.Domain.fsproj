@@ -8,11 +8,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Meetings\Meeting.fs" />
+    <Compile Include="Members\Events.fs" />
+    <Compile Include="Members\Member.fs" />
+    <Compile Include="DomainTypes.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharpPlus" Version="1.1.7" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Domain\CompanyName.MyMeetings.BuildingBlocks.Domain\CompanyName.MyMeetings.BuildingBlocks.Domain.fsproj" />
   </ItemGroup>
 
 </Project>
