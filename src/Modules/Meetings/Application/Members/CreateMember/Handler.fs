@@ -59,5 +59,5 @@ module Handler =
                 save m
                 |> Reader.local (fun (e: Env) -> { Conn = e.Conn })
 
-            return r, m.DomainEvents
+            return r//, m.DomainEvents
         }

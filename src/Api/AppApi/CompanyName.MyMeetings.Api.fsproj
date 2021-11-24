@@ -22,6 +22,8 @@
     <PackageReference Include="FSharp.SystemTextJson" Version="0.16.6" />
     <PackageReference Include="FSharpPlus" Version="1.1.7" />
     <PackageReference Include="FsToolkit.ErrorHandling" Version="2.1.2" />
+    <PackageReference Include="NServiceBus" Version="7.5.0" />
+    <PackageReference Include="NServiceBus.Extensions.Hosting" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

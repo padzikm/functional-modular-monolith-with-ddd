@@ -7,6 +7,7 @@ open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.CreateMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.EditMeeting
+open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure.MeetingsModule
 open FSharpPlus
@@ -16,6 +17,7 @@ open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.GetMeetingDetails
+open NServiceBus
 
 type EditMeetingRequest =
     { EventFeeValue: decimal option
@@ -23,7 +25,7 @@ type EditMeetingRequest =
 
 [<ApiController>]
 [<Route("[controller]")>]
-type MeetingsController(logger: ILogger<MeetingsController>, config: IConfiguration) =
+type MeetingsController(logger: ILogger<MeetingsController>, config: IConfiguration, session: IMessageSession) =
     inherit ControllerBase()
 
     member private _.connectionString = config.["MeetingsConnectionString"]
@@ -34,6 +36,19 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
 
     member private this.badRequest(ex: Exception) =
         this.BadRequest(ex.ToString()) :> ActionResult
+    
+    [<HttpGet>]
+    member this.Bla() =
+        let cmd: CreateMemberCommand = {
+            MemberId = Guid.NewGuid()
+            Login = "jakis"
+            FirstName = "pierwsze"
+            LastName = "drugie"
+            Name = "imie"
+            Email = "mail@domena"
+        }
+        session.Send cmd |> Async.AwaitTask |> ignore
+        this.ok "udalo sie"
     
     [<HttpGet("{id}")>]
     member this.GetMeetingDetails(id: Guid) =

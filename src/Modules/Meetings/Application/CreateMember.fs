@@ -1,19 +1,35 @@
-namespace CompanyName.MyMeetings.Modules.Meetings.Domain.CreateMember
+namespace CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember
 
 open System
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open FSharpPlus
 open FSharpPlus.Data
+open NServiceBus
 
 module Types =
-    type CreateMemberCommand = {
+//    type CreateMemberCommand() =
+//        interface ICommand with
+//        member val MemberId = Guid.Empty with get, set
+//        member val Login = "" with get, set
+//        member val FirstName = "" with get, set
+//        member val LastName = "" with get, set
+//        member val Email = "" with get, set
+//        member val Name = "" with get, set
+        
+    [<CLIMutable>]
+    type CreateMemberCommand =
+        {
         MemberId: Guid
         Login: string
         FirstName: string
         LastName: string
         Email: string
         Name: string
-    }
+        }
+        interface ICommand with
+        
+        
+            
     
     type MemberCreatedDomainEvent = {
         MemberId: Guid
