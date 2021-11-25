@@ -20,5 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\CompanyName.MyMeetings.Modules.Meetings.Application.fsproj" />
+    <ProjectReference Include="..\Infrastructure\CompanyName.MyMeetings.Modules.Meetings.Infrastructure.csproj" />
+    <ProjectReference Include="..\Infrastructure\CompanyName.MyMeetings.Modules.Meetings.Infrastructure.fsproj" />
   </ItemGroup>
 </Project>
