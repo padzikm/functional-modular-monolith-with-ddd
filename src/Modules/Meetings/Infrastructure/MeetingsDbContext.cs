@@ -7,6 +7,10 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Infrastructure
     {
         public DbSet<Member> Members { get; set; }
 
+        public MeetingsDbContext(DbContextOptions options) : base(options)
+        {
+        }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(this.GetType().Assembly);

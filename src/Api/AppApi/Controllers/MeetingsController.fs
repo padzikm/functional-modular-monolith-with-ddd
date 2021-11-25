@@ -8,8 +8,6 @@ open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.CreateMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.EditMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
-open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
-open CompanyName.MyMeetings.Modules.Meetings.Infrastructure.MeetingsModule
 open FSharpPlus
 open FSharpPlus.Data
 open FsToolkit.ErrorHandling
@@ -50,25 +48,25 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
         session.Send cmd |> Async.AwaitTask |> ignore
         this.ok "udalo sie"
     
-    [<HttpGet("{id}")>]
-    member this.GetMeetingDetails(id: Guid) =
-        let query : GetMeetingDetailsQuery = GetMeetingDetailsQuery(id)
-
-        MeetingsModule.getMeetingDetails this.connectionString query
-        |> AsyncResult.foldResult this.ok this.notFound
-
-
-    [<HttpPost>]
-    member this.CreateNewMeeting([<FromBody>] request: CreateMeetingCommand) =
-        MeetingsModule.createMeeting this.connectionString request
-        |> AsyncResult.foldResult this.ok this.badRequest
-
-
-    [<HttpPut("{id}")>]
-    member this.EditMeeting([<FromRoute>] id: Guid, [<FromBody>] request: EditMeetingRequest) =
-        let command : EditMeetingCommand =
-                { Id = id
-                  EventFeeValue = request.EventFeeValue
-                  EventFeeCurrency = request.EventFeeCurrency }
-        MeetingsModule.editMeeting this.connectionString command
-        |> AsyncResult.foldResult this.ok this.badRequest
+//    [<HttpGet("{id}")>]
+//    member this.GetMeetingDetails(id: Guid) =
+//        let query : GetMeetingDetailsQuery = GetMeetingDetailsQuery(id)
+//
+//        MeetingsModule.getMeetingDetails this.connectionString query
+//        |> AsyncResult.foldResult this.ok this.notFound
+//
+//
+//    [<HttpPost>]
+//    member this.CreateNewMeeting([<FromBody>] request: CreateMeetingCommand) =
+//        MeetingsModule.createMeeting this.connectionString request
+//        |> AsyncResult.foldResult this.ok this.badRequest
+//
+//
+//    [<HttpPut("{id}")>]
+//    member this.EditMeeting([<FromRoute>] id: Guid, [<FromBody>] request: EditMeetingRequest) =
+//        let command : EditMeetingCommand =
+//                { Id = id
+//                  EventFeeValue = request.EventFeeValue
+//                  EventFeeCurrency = request.EventFeeCurrency }
+//        MeetingsModule.editMeeting this.connectionString command
+//        |> AsyncResult.foldResult this.ok this.badRequest

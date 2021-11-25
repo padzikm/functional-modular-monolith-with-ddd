@@ -6,16 +6,7 @@ open FSharpPlus
 open FSharpPlus.Data
 open NServiceBus
 
-module Types =
-//    type CreateMemberCommand() =
-//        interface ICommand with
-//        member val MemberId = Guid.Empty with get, set
-//        member val Login = "" with get, set
-//        member val FirstName = "" with get, set
-//        member val LastName = "" with get, set
-//        member val Email = "" with get, set
-//        member val Name = "" with get, set
-        
+module Types =      
     [<CLIMutable>]
     type CreateMemberCommand =
         {
@@ -26,10 +17,7 @@ module Types =
         Email: string
         Name: string
         }
-        interface ICommand with
-        
-        
-            
+        interface ICommand with                        
     
     type MemberCreatedDomainEvent = {
         MemberId: Guid
@@ -72,7 +60,7 @@ module Implementation =
     let publishMemberCreatedEvent e: Program<_> = PublishMemberCreatedEvent(e, ()) |> (Free.liftF << InL << InR)
     let logInfo s: Program<_> = LogInfo(s, ()) |> (Free.liftF << InR)
     
-    let createMember (cmd: CreateMemberCommand) now = monad {
+    let handler (cmd: CreateMemberCommand) now = monad {
         let m: Member = {
             MemberId = cmd.MemberId; Name = cmd.Name; FirstName = cmd.FirstName; LastName = cmd.LastName
             Email = cmd.LastName; Login = cmd.Email; CreatedDate = now
