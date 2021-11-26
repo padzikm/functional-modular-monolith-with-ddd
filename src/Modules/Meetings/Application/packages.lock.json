@@ -32,6 +32,12 @@
           "FSharp.Core": "4.6.2"
         }
       },
+      "MediatR": {
+        "type": "Direct",
+        "requested": "[9.0.0, )",
+        "resolved": "9.0.0",
+        "contentHash": "8b3UYNxegHVYcJMG2zH8wn+YqxLvXG+eMfj0cMCq/jTW72p6O3PCKMkrIv0mqyxdW7bA4gblsocw7n+/9Akg5g=="
+      },
       "NServiceBus": {
         "type": "Direct",
         "requested": "[7.5.0, )",

@@ -20,7 +20,7 @@ module Program =
                 endpoint
                 )
             .ConfigureServices(fun ctx services ->
-                services.AddDbContext<MeetingsDbContext>(fun opt ->
+                services.AddDbContext<MeetingsDbContext>(fun opt ->                    
                     opt.UseSqlServer("Server=localhost;Database=MyMeetings;User Id=sa;Password=SqlServer2019;") |> ignore             
                     ) |> ignore      
                 )

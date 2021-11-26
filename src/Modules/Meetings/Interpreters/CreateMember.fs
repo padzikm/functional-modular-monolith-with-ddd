@@ -1,16 +1,18 @@
-namespace CompanyName.MyMeetings.Modules.Meetings.Service.CreateMember
+namespace CompanyName.MyMeetings.Modules.Meetings.Interpreters.CreateMember
 
 open System
 open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Implementation
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Algebra
+open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
+open CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Database
 open FSharpPlus
 open FSharpPlus.Data
 open Microsoft.Extensions.Logging
 open NServiceBus
 
-type CreateMemberHandler (logger: ILogger<CreateMemberHandler>) =
+type CreateMemberHandler (logger: ILogger<CreateMemberHandler>, dbContext: MeetingsDbContext) =
     let rec interpret (p: Program<_>) =
         let go v =
             match v with
@@ -20,7 +22,11 @@ type CreateMemberHandler (logger: ILogger<CreateMemberHandler>) =
                     match dbi with
                     | SaveMember (m, i) ->
                         logger.LogInformation (sprintf "save member %A" m)
+                        let memb = Member(Id = m.MemberId, Name = m.Name, FirstName = m.FirstName, LastName = m.LastName,
+                                              Login = m.Login, Email = m.Email, CreatedDate = m.CreatedDate)                            
                         async {
+                            dbContext.Members.Add(memb) |> ignore
+                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                             return i
                         }
                 | InR evi ->

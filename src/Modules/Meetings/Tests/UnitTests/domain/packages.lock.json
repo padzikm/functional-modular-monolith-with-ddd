@@ -94,6 +94,11 @@
           "FSharp.Core": "4.2.3"
         }
       },
+      "MediatR": {
+        "type": "Transitive",
+        "resolved": "9.0.0",
+        "contentHash": "8b3UYNxegHVYcJMG2zH8wn+YqxLvXG+eMfj0cMCq/jTW72p6O3PCKMkrIv0mqyxdW7bA4gblsocw7n+/9Akg5g=="
+      },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
         "resolved": "16.7.1",
@@ -777,6 +782,7 @@
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
           "FsToolkit.ErrorHandling": "2.1.2",
+          "MediatR": "9.0.0",
           "NServiceBus": "7.5.0",
           "System.Data.SqlClient": "4.6.0"
         }
