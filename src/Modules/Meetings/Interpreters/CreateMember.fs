@@ -5,12 +5,26 @@ open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Implementation
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Algebra
+open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Database
 open FSharpPlus
 open FSharpPlus.Data
+open FsToolkit.ErrorHandling.Operator.Validation
+open MediatR
+open MediatR
 open Microsoft.Extensions.Logging
 open NServiceBus
+open FsToolkit.ErrorHandling
+
+type CreateMemberCommandValidator (logger: ILogger<CreateMemberCommandValidator>, session: IMessageSession) =
+    inherit RequestHandler<CreateMemberCommand, Async<Validation<unit, string>>>()
+        override this.Handle(request) =
+            async {
+                do! session.Send(request) |> Async.AwaitTask
+                let r = Ok ()
+                return Validation.ofResult r
+            }
 
 type CreateMemberHandler (logger: ILogger<CreateMemberHandler>, dbContext: MeetingsDbContext) =
     let rec interpret (p: Program<_>) =
@@ -47,7 +61,7 @@ type CreateMemberHandler (logger: ILogger<CreateMemberHandler>, dbContext: Meeti
         
     interface IHandleMessages<CreateMemberCommand> with
         member this.Handle(message, context) =
-            async {
+            async {                
                 logger.LogInformation "message received"
                 logger.LogInformation (sprintf "%A" message)
                 let program = handler message DateTime.UtcNow

@@ -1,6 +1,7 @@
 namespace CompanyName.MyMeetings.Modules.Meetings.Application.GetMember
 
 open System
+open FsToolkit.ErrorHandling
 open MediatR
 open NServiceBus
 
@@ -20,5 +21,5 @@ module Types =
         {
             Id: Guid
         }
-        interface IRequest<GetMemberQueryResult> with    
+        interface IRequest<Async<Validation<GetMemberQueryResult, string>>> with    
     

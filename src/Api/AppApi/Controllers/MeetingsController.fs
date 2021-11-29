@@ -10,7 +10,7 @@ open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.CreateMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.EditMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open FSharpPlus
-open FSharpPlus.Data
+//open FSharpPlus.Data
 open FsToolkit.ErrorHandling
 open MediatR
 open Microsoft.AspNetCore.Mvc
@@ -25,7 +25,7 @@ type EditMeetingRequest =
 
 [<ApiController>]
 [<Route("[controller]")>]
-type MeetingsController(logger: ILogger<MeetingsController>, config: IConfiguration, session: IMessageSession, dispatch: IMediator) =
+type MeetingsController(logger: ILogger<MeetingsController>, config: IConfiguration, dispatch: IMediator) =
     inherit ControllerBase()
 
     member private _.connectionString = config.["MeetingsConnectionString"]
@@ -46,16 +46,25 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
             LastName = "drugie"
             Name = "imie"
             Email = "mail@domena"
-        }        
-        session.Send cmd |> Async.AwaitTask |> ignore
-        this.ok "udalo sie"
+        }
+        //let y = dispatch.Send cmd |> Async.AwaitTask |> Async.join
+        async {
+            let! _ = dispatch.Send cmd |> Async.AwaitTask |> Async.join
+            return "udao sie"
+        }
+        //this.ok "udalo sie"
         
     [<HttpGet("{str}")>]
     member this.Cos(str: string) =
         let query: GetMemberQuery = {
             Id = Guid.NewGuid()
         }
-        dispatch.Send(query)
+        async {
+            let! r = dispatch.Send query |> Async.AwaitTask |> Async.join
+            return match r with
+                | Ok v -> this.ok v
+                | Error er -> this.BadRequest(er) :> ActionResult
+        }
     
 //    [<HttpGet("{id}")>]
 //    member this.GetMeetingDetails(id: Guid) =

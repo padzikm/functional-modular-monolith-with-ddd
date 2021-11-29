@@ -5,10 +5,11 @@ open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
 open Microsoft.Extensions.Logging
 open MediatR
 open Microsoft.EntityFrameworkCore
+open FsToolkit.ErrorHandling
 
 type GetMemberHandler (logger: ILogger<GetMemberHandler>, dbContext: MeetingsDbContext) =
-    interface IRequestHandler<GetMemberQuery, GetMemberQueryResult> with
-        member this.Handle(request, cancellationToken) =
+    inherit RequestHandler<GetMemberQuery, Async<Validation<GetMemberQueryResult, string>>>()
+        override this.Handle(request) =
             async {
                 logger.LogInformation (sprintf "inside handler %A" request)
                 let! res = dbContext.Members.FirstAsync() |> Async.AwaitTask
@@ -21,5 +22,5 @@ type GetMemberHandler (logger: ILogger<GetMemberHandler>, dbContext: MeetingsDbC
                     Email = res.Email
                     Login = res.Login                    
                 }
-                return qr
-            } |> Async.StartAsTask
+                return Validation.ofResult (Ok qr)
+            }

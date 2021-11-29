@@ -4,6 +4,9 @@ open System
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open FSharpPlus
 open FSharpPlus.Data
+open FsToolkit.ErrorHandling
+open FsToolkit.ErrorHandling.Operator.Validation
+open MediatR
 open NServiceBus
 
 module Types =      
@@ -17,7 +20,8 @@ module Types =
         Email: string
         Name: string
         }
-        interface ICommand with                        
+        interface ICommand with
+        interface IRequest<Async<Validation<unit,string>>> with
     
     type MemberCreatedDomainEvent = {
         MemberId: Guid
