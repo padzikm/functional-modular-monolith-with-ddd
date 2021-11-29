@@ -67,7 +67,7 @@ module Implementation =
     let handler (cmd: CreateMemberCommand) now = monad {
         let m: Member = {
             MemberId = cmd.MemberId; Name = cmd.Name; FirstName = cmd.FirstName; LastName = cmd.LastName
-            Email = cmd.LastName; Login = cmd.Email; CreatedDate = now
+            Email = cmd.Email; Login = cmd.Login; CreatedDate = now
         }
         do! saveMember m
         let e: MemberCreatedDomainEvent = {MemberId = cmd.MemberId}

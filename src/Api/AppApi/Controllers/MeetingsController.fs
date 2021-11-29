@@ -12,7 +12,9 @@ open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open FSharpPlus
 //open FSharpPlus.Data
 open FsToolkit.ErrorHandling
+open FsToolkit.ErrorHandling.Operator.AsyncResult
 open MediatR
+open Microsoft.AspNetCore.Mvc
 open Microsoft.AspNetCore.Mvc
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
@@ -22,6 +24,10 @@ open NServiceBus
 type EditMeetingRequest =
     { EventFeeValue: decimal option
       EventFeeCurrency: string option }
+    
+[<CLIMutable>]
+type M =
+    {Login: string; Name: string}
 
 [<ApiController>]
 [<Route("[controller]")>]
@@ -37,34 +43,46 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
     member private this.badRequest(ex: Exception) =
         this.BadRequest(ex.ToString()) :> ActionResult
     
-    [<HttpGet>]
-    member this.Bla() =
+    [<HttpGet("/do")>]
+    member this.Bla([<FromQuery>] login: string, [<FromQuery>] name: string) =
         let cmd: CreateMemberCommand = {
             MemberId = Guid.NewGuid()
-            Login = "jakis"
+            Login = login
             FirstName = "pierwsze"
             LastName = "drugie"
-            Name = "imie"
+            Name = name
             Email = "mail@domena"
         }
-        //let y = dispatch.Send cmd |> Async.AwaitTask |> Async.join
-        async {
-            let! _ = dispatch.Send cmd |> Async.AwaitTask |> Async.join
-            return "udao sie"
-        }
+        let r = AsyncResult.ofTask (dispatch.Send cmd)// |> Async.AwaitTask |> Async.join
+        //let m = r |> AsyncResult.mapError (fun e -> Error (e.ToString()) |> Validation.ofResult |> Async.singleton)
+        let y = r |> AsyncResult.foldResult id (fun e -> Error (e.ToString()) |> Validation.ofResult |> Async.singleton)
+        let q = y |> Async.join
+        let u = q |> AsyncResult.foldResult this.ok (fun er -> this.BadRequest(er) :> ActionResult)
+        u
+//        async {
+//            let! _ = dispatch.Send cmd |> Async.AwaitTask |> Async.join
+//            return "udao sie"
+//        }
         //this.ok "udalo sie"
         
-    [<HttpGet("{str}")>]
-    member this.Cos(str: string) =
+    [<HttpGet("get/{str}")>]
+    member this.Cos(str: Guid) =
         let query: GetMemberQuery = {
-            Id = Guid.NewGuid()
+            Id = str
         }
-        async {
-            let! r = dispatch.Send query |> Async.AwaitTask |> Async.join
-            return match r with
-                | Ok v -> this.ok v
-                | Error er -> this.BadRequest(er) :> ActionResult
-        }
+        let r = AsyncResult.ofTask (dispatch.Send query)// |> Async.AwaitTask |> Async.join
+        let p = r |> AsyncResult.foldResult id (fun e -> Error (e.ToString()) |> Validation.ofResult |> Async.singleton)
+        let w = p |> Async.join
+        let b = w |> AsyncResult.foldResult this.ok (fun er -> this.BadRequest(er) :> ActionResult)
+        b
+//        async {
+//            let! r = dispatch.Send query |> Async.AwaitTask |> Async.join
+//            let b = r |> Result.fold this.ok (fun er -> this.BadRequest(er) :> ActionResult)
+//            return b
+//            return match r with
+//                | Ok v -> this.ok v
+//                | Error er -> this.BadRequest(er) :> ActionResult
+        //}
     
 //    [<HttpGet("{id}")>]
 //    member this.GetMeetingDetails(id: Guid) =

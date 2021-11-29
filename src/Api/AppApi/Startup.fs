@@ -6,6 +6,7 @@ open System.Linq
 open System.Text.Json.Serialization
 open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
+open CompanyName.MyMeetings.Modules.Meetings.Interpreters.CreateMember
 open CompanyName.MyMeetings.Modules.Meetings.Interpreters.GetMember
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
@@ -27,7 +28,7 @@ type Startup(configuration: IConfiguration) =
         services.AddDbContext<MeetingsDbContext>(fun opt ->                    
                     opt.UseSqlServer("Server=localhost;Database=MyMeetings;User Id=sa;Password=SqlServer2019;") |> ignore             
                     ) |> ignore
-        services.AddMediatR(typeof<GetMemberHandler>) |> ignore
+        services.AddMediatR(typeof<CreateMemberHandler>) |> ignore
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     member _.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =

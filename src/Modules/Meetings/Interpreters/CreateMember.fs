@@ -20,11 +20,29 @@ open FsToolkit.ErrorHandling
 type CreateMemberCommandValidator (logger: ILogger<CreateMemberCommandValidator>, session: IMessageSession) =
     inherit RequestHandler<CreateMemberCommand, Async<Validation<unit, string>>>()
         override this.Handle(request) =
-            async {
-                do! session.Send(request) |> Async.AwaitTask
-                let r = Ok ()
-                return Validation.ofResult r
-            }
+            let f _ _ (r: CreateMemberCommand) = AsyncResult.ofTaskAction (session.Send(r))
+//                    async {
+//                        do! session.Send(r) |> Async.AwaitTask
+//                    }
+            //let g a b = Result.protect (f a b)
+            let l = Result.requireNotNull "login must be not null" request.Login
+            let n = Result.requireNotNull "name must be not null" request.Name
+            let s = f <!^> l <*^> n <*^> (Result.Ok request)
+            let r = Result.sequenceAsync s          
+            let i = r |> AsyncResult.foldResult (Result.mapError (fun e -> [e.ToString()])) Result.Error
+            i
+//            async {
+//                let f l n =
+//                    async {
+//                        do! session.Send(request) |> Async.AwaitTask
+//                    }
+//                let l = Result.requireNotNull "login must be not null" request.Login |> Validation.ofResult
+//                let n = Result.requireNotNull "name must be not null" request.Name |> Validation.ofResult
+//                let s = l <*> n
+//                do! session.Send(request) |> Async.AwaitTask
+////                let r = Ok ()
+//                return Validation.ok ()
+//            }
 
 type CreateMemberHandler (logger: ILogger<CreateMemberHandler>, dbContext: MeetingsDbContext) =
     let rec interpret (p: Program<_>) =
