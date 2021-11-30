@@ -20,15 +20,17 @@ open FsToolkit.ErrorHandling
 type CreateMemberCommandValidator (logger: ILogger<CreateMemberCommandValidator>, session: IMessageSession) =
     inherit RequestHandler<CreateMemberCommand, Async<Validation<unit, string>>>()
         override this.Handle(request) =
-            let f _ _ (r: CreateMemberCommand) = AsyncResult.ofTaskAction (session.Send(r))
+            let f (r: CreateMemberCommand) = AsyncResult.ofTaskAction (session.Send(r))
 //                    async {
 //                        do! session.Send(r) |> Async.AwaitTask
 //                    }
             //let g a b = Result.protect (f a b)
-            let l = Result.requireNotNull "login must be not null" request.Login
-            let n = Result.requireNotNull "name must be not null" request.Name
-            let s = f <!^> l <*^> n <*^> (Result.Ok request)
-            let r = Result.sequenceAsync s          
+            let v = validate request
+            let y = f <!> v
+            //let l = Result.requireNotNull "login must be not null" request.Login
+            //let n = Result.requireNotNull "name must be not null" request.Name
+            //let s = f <!^> l <*^> n <*^> (Result.Ok request)
+            let r = Result.sequenceAsync y         
             let i = r |> AsyncResult.foldResult (Result.mapError (fun e -> [e.ToString()])) Result.Error
             i
 //            async {

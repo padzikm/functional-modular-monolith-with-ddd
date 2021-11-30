@@ -64,6 +64,17 @@ module Implementation =
     let publishMemberCreatedEvent e: Program<_> = PublishMemberCreatedEvent(e, ()) |> (Free.liftF << InL << InR)
     let logInfo s: Program<_> = LogInfo(s, ()) |> (Free.liftF << InR)
     
+    let validate (cmd: CreateMemberCommand) =
+        let l = Result.requireNotNull $"{nameof cmd.Login} must be not null" cmd.Login
+        let n = Result.requireNotNull $"{nameof cmd.Name} must be not null" cmd.Name
+        let fn = Result.requireNotNull $"{nameof cmd.FirstName} must be not null" cmd.FirstName
+        let ln = Result.requireNotNull $"{nameof cmd.LastName} must be not null" cmd.LastName
+        let e = Result.requireNotNull $"{nameof cmd.Email} must be not null" cmd.Email
+        let g = if cmd.MemberId = Unchecked.defaultof<Guid> then Error $"{nameof cmd.MemberId} cannot be empty" else Ok cmd.MemberId
+        let f _ _ _ _ _ _ = cmd
+        let r = f <!^> l <*^> n <*^> fn <*^> ln <*^> e <*^> g
+        r
+    
     let handler (cmd: CreateMemberCommand) now = monad {
         let m: Member = {
             MemberId = cmd.MemberId; Name = cmd.Name; FirstName = cmd.FirstName; LastName = cmd.LastName

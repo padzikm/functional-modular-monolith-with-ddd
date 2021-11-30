@@ -43,14 +43,14 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
     member private this.badRequest(ex: Exception) =
         this.BadRequest(ex.ToString()) :> ActionResult
     
-    [<HttpGet("/do")>]
-    member this.Bla([<FromQuery>] login: string, [<FromQuery>] name: string) =
+    [<HttpGet("do")>]
+    member this.Bla([<FromQuery>] req: M) =
         let cmd: CreateMemberCommand = {
             MemberId = Guid.NewGuid()
-            Login = login
+            Login = req.Login
             FirstName = "pierwsze"
             LastName = "drugie"
-            Name = name
+            Name = req.Name
             Email = "mail@domena"
         }
         let r = AsyncResult.ofTask (dispatch.Send cmd)// |> Async.AwaitTask |> Async.join

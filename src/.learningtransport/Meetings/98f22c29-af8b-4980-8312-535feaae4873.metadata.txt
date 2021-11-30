@@ -1,13 +1,13 @@
 {
-  "NServiceBus.MessageId": "1bdc31c6-d270-450c-9ff4-adef013fef46",
+  "NServiceBus.MessageId": "959b884e-4d09-4672-9cfa-adf00001e89f",
   "NServiceBus.MessageIntent": "Send",
-  "NServiceBus.ConversationId": "7586418a-48ef-468d-9087-adef013fef46",
-  "NServiceBus.CorrelationId": "1bdc31c6-d270-450c-9ff4-adef013fef46",
+  "NServiceBus.ConversationId": "9fa05757-f213-49f8-8afb-adf00001e89f",
+  "NServiceBus.CorrelationId": "959b884e-4d09-4672-9cfa-adf00001e89f",
   "NServiceBus.OriginatingMachine": "mbp-magic",
   "NServiceBus.OriginatingEndpoint": "Api",
   "$.diagnostics.originating.hostid": "7c43c59717e064f91ce153b4ca48a4a3",
   "NServiceBus.ContentType": "text\/xml",
   "NServiceBus.EnclosedMessageTypes": "CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types+CreateMemberCommand, CompanyName.MyMeetings.Modules.Meetings.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
   "NServiceBus.Version": "7.5.0",
-  "NServiceBus.TimeSent": "2021-11-29 19:24:50:788379 Z"
+  "NServiceBus.TimeSent": "2021-11-30 00:06:56:959423 Z"
 }
