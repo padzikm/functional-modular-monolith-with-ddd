@@ -10,11 +10,13 @@ open FSharpPlus
 open FsToolkit.ErrorHandling
 
 type GetMemberHandler (logger: ILogger<GetMemberHandler>, dbContext: MeetingsDbContext) =
-    inherit RequestHandler<GetMemberQuery, Async<Validation<GetMemberQueryResult, string>>>()
+    inherit RequestHandler<GetMemberQuery, Async<Validation<GetMemberQueryResult option, string>>>()
         override this.Handle(request) =
             //logger.LogInformation (sprintf "inside handler %A" request)
-            let r = AsyncResult.ofTask (dbContext.Members.FirstAsync(fun m -> m.Id = request.Id))
-            let u = r |> AsyncResult.map (fun m ->
+            let r = AsyncResult.ofTask (dbContext.Members.FirstOrDefaultAsync(fun m -> m.Id = request.Id))
+            //logger.LogInformation "after get member"
+            let o = r |> AsyncResult.map Option.ofObj
+            let u = o |> AsyncResultOption.map (fun m ->
                     let qr: GetMemberQueryResult = {
                         Id = m.Id
                         FirstName = m.FirstName

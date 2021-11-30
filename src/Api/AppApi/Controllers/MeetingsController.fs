@@ -73,7 +73,8 @@ type MeetingsController(logger: ILogger<MeetingsController>, config: IConfigurat
         let r = AsyncResult.ofTask (dispatch.Send query)// |> Async.AwaitTask |> Async.join
         let p = r |> AsyncResult.foldResult id (fun e -> Error (e.ToString()) |> Validation.ofResult |> Async.singleton)
         let w = p |> Async.join
-        let b = w |> AsyncResult.foldResult this.ok (fun er -> this.BadRequest(er) :> ActionResult)
+        let q = AsyncResultOption.map this.ok w
+        let b = q |> AsyncResult.foldResult (Option.defaultValue (this.NotFound() :> ActionResult)) (fun er -> this.BadRequest(er) :> ActionResult)
         b
 //        async {
 //            let! r = dispatch.Send query |> Async.AwaitTask |> Async.join

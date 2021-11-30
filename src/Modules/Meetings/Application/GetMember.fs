@@ -21,5 +21,5 @@ module Types =
         {
             Id: Guid
         }
-        interface IRequest<Async<Validation<GetMemberQueryResult, string>>> with    
+        interface IRequest<Async<Validation<GetMemberQueryResult option, string>>> with    
     
