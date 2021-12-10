@@ -59,8 +59,8 @@ type CreateMemberHandler (logger: ILogger<CreateMemberHandler>, dbContext: Meeti
                         let memb = Member(Id = m.MemberId, Name = m.Name, FirstName = m.FirstName, LastName = m.LastName,
                                               Login = m.Login, Email = m.Email, CreatedDate = m.CreatedDate)                            
                         async {
-                            dbContext.Members.Add(memb) |> ignore
-                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+                            let _ = dbContext.Members.Add(memb)// |> Async.AwaitTask
+//                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                             return i
                         }
                 | InR evi ->
@@ -86,6 +86,7 @@ type CreateMemberHandler (logger: ILogger<CreateMemberHandler>, dbContext: Meeti
                 logger.LogInformation (sprintf "%A" message)
                 let program = handler message DateTime.UtcNow
                 let! result = interpret program
+                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                 logger.LogInformation (sprintf "interpret result %A" result)
                 logger.LogInformation "message handled"
             } |> Async.StartAsTask :> Task

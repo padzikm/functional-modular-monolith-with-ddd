@@ -28,7 +28,7 @@ type Startup(configuration: IConfiguration) =
         services.AddDbContext<MeetingsDbContext>(fun opt ->                    
                     opt.UseSqlServer("Server=localhost;Database=MyMeetings;User Id=sa;Password=SqlServer2019;") |> ignore             
                     ) |> ignore
-        services.AddMediatR(typeof<CreateMemberHandler>) |> ignore
+        services.AddMediatR(typeof<CreateMemberHandler>) |> ignore        
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     member _.Configure(app: IApplicationBuilder, env: IWebHostEnvironment) =

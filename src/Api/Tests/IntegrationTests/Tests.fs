@@ -11,7 +11,13 @@ open CompanyName.MyMeetings.Api
 open CompanyName.MyMeetings.Api.Controllers.MeetingsController
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.CreateMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.EditMeeting
+open Microsoft.AspNetCore.Http.Extensions
 open Microsoft.AspNetCore.Mvc.Testing
+open Microsoft.AspNetCore.TestHost
+open Microsoft.AspNetCore.WebUtilities
+open NServiceBus
+open NServiceBus.Testing
+open Microsoft.Extensions.DependencyInjection
 open Xunit
 open FsUnit.Xunit
 open Xunit.Abstractions
@@ -22,6 +28,33 @@ options.Converters.Add(JsonFSharpConverter())
 let serverFactory = new WebApplicationFactory<Startup>()
 
 type Tests (output: ITestOutputHelper) =
+    
+    [<Fact>]
+    let ``sent msg`` () =
+        let session = TestableMessageSession()
+        let client = serverFactory.WithWebHostBuilder(fun b ->
+            b.ConfigureTestServices(fun s ->               
+                s.AddScoped<IMessageSession>(fun p -> session :> IMessageSession) |> ignore ) |> ignore).CreateClient()
+
+        async {
+            let qq: M = {
+                Login = "asdfasdfasdf"
+                Name = "asdfadf"
+            }
+            let uri = $"/meetings/do"
+            let d = Map(seq {
+                yield (nameof qq.Login, qq.Login)
+                yield (nameof qq.Name, qq.Name)
+            })
+            let r = QueryHelpers.AddQueryString(uri, d)
+            output.WriteLine(r)
+     
+            let! value = client.GetAsync(r) |> Async.AwaitTask
+            let! res = value.Content.ReadAsStringAsync() |> Async.AwaitTask
+            output.WriteLine(res)
+            session.SentMessages.Length |> should equal 1
+            value.IsSuccessStatusCode |> should be True
+        }
     
     [<Fact>]
     let ``get nonexistent meeting returns not found`` () =
