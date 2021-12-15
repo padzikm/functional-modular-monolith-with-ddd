@@ -16,6 +16,7 @@
     <None Include="freestackplus.fsx" />
     <None Include="freestackplusasync.fsx" />
     <Compile Include="CreateMember.fs" />
+    <Compile Include="ProposeMeetingGroup.fs" />
     <Compile Include="GetMember.fs" />
     <None Include="freestackplusasyncfold.fsx" />
     <None Include="freestackplusasyncfoldtrans.fsx" />
@@ -38,6 +39,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\CompanyName.MyMeetings.Modules.Meetings.Domain.fsproj" />
+    <ProjectReference Include="..\InternalEvents\CompanyName.MyMeetings.Modules.Meetings.InternalEvents.fsproj" />
   </ItemGroup>
 
 </Project>

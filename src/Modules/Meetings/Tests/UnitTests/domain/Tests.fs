@@ -51,9 +51,11 @@ let createMemberCmd: Gen<CreateMemberCommand> =
     }
 
 type MyGens =
-    static member CreateMemberCmd() = Arb.fromGen createMemberCmd       
+    static member CreateMemberCmd() = Arb.fromGen createMemberCmd
+    
         
-type Tests (output: ITestOutputHelper) =        
+type Tests (output: ITestOutputHelper) =
+    
 
 //    do Arb.register<MyGens>() |> ignore
     
@@ -113,7 +115,7 @@ type Tests (output: ITestOutputHelper) =
             
         let o = {SaveMemberCalled = NotCalled; PublishMemberCreatedEventCalled = NotCalled}
         
-        let rec interpret (p: Program<_>) =
+        let interpret (p: Program<_>) =
             let go v =
                 match v with
                 | InL l ->

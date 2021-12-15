@@ -1349,6 +1349,7 @@
         "type": "Project",
         "dependencies": {
           "CompanyName.MyMeetings.Modules.Meetings.Domain": "1.0.0",
+          "CompanyName.MyMeetings.Modules.Meetings.InternalEvents": "1.0.0",
           "Dapper": "2.0.78",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
@@ -1372,6 +1373,15 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "5.0.12",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.12"
+        }
+      },
+      "companyname.mymeetings.modules.meetings.internalevents": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "5.0.0",
+          "FsToolkit.ErrorHandling": "2.11.1",
+          "MediatR": "9.0.0",
+          "NServiceBus": "7.5.0"
         }
       },
       "companyname.mymeetings.modules.meetings.interpreters": {

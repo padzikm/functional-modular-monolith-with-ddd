@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Tests.fs" />
+    <Compile Include="MeetingGroupProposalTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
