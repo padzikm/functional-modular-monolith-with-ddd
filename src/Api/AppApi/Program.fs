@@ -6,6 +6,7 @@ open System.IO
 open System.Linq
 open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
+open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
 open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Configuration
@@ -26,6 +27,7 @@ module Program =
                 let routing = transport.Routing()
                 //let t = typeof<CreateMemberCommand>
                 routing.RouteToEndpoint(typeof<CreateMemberCommand>, "Meetings") |> ignore
+                routing.RouteToEndpoint(typeof<ProposeMeetingGroupCommand>, "Meetings") |> ignore
                 endpoint
                 )
             .ConfigureWebHostDefaults(fun webBuilder ->

@@ -8,6 +8,7 @@ open System.Text
 open System.Text.Json
 open System.Text.Json.Serialization
 open CompanyName.MyMeetings.Api
+open CompanyName.MyMeetings.Api.Controllers.MeetingGroupProposalController
 open CompanyName.MyMeetings.Api.Controllers.MeetingsController
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.CreateMeeting
 open CompanyName.MyMeetings.Modules.Meetings.Application.Meetings.EditMeeting
@@ -28,6 +29,26 @@ options.Converters.Add(JsonFSharpConverter())
 let serverFactory = new WebApplicationFactory<Startup>()
 
 type Tests (output: ITestOutputHelper) =
+    
+    [<Fact>]
+    let ``propose meeting group`` () =
+        let s = TestableMessageSession()
+        let client = serverFactory.WithWebHostBuilder(fun b ->
+            b.ConfigureTestServices(fun sc ->
+                sc.AddScoped<IMessageSession>(fun _ -> s :> IMessageSession) |> ignore) |> ignore).CreateClient()
+        
+        let req: ProposeMeetingGroupRequest = {
+            Name = "agf"
+            Description = "asfgads asfd adsf"
+            LocationCity = "tgwojw ffe"
+            LocationCountryCode = "kjfd"
+        }
+        async {
+            let! r = client.PostAsJsonAsync("/api/meetings/meetinggroupproposal/", req) |> Async.AwaitTask 
+            output.WriteLine (sprintf "%O" r)
+            r.IsSuccessStatusCode |> should equal true
+            s.SentMessages.Length |> should equal 1
+        }
     
     [<Fact>]
     let ``sent msg`` () =

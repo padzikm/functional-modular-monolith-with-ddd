@@ -6,6 +6,8 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Infrastructure
     public class MeetingsDbContext : DbContext
     {
         public DbSet<Member> Members { get; set; }
+        
+        public DbSet<MeetingGroupProposal> MeetingGroupProposals { get; set; }
 
         public MeetingsDbContext(DbContextOptions options) : base(options)
         {

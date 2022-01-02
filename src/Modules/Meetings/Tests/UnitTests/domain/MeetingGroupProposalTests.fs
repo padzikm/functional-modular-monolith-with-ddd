@@ -85,7 +85,7 @@ type Tests (output: ITestOutputHelper) =
             failwith cmd.Name
         let now = DateTime.UtcNow
         let guid = Guid.NewGuid()
-        let p = ProposeMeetingGroup.Implementation.handler cmd now guid
+        let p = ProposeMeetingGroup.Implementation.handler cmd now guid (Guid.NewGuid())
         let s = interpret p
         let rs = State.exec s is
         

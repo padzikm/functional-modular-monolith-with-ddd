@@ -2,13 +2,27 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGrou
 
 open System
 open System
+open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open CompanyName.MyMeetings.Modules.Meetings.Domain.DomainEvents
-open CompanyName.MyMeetings.Modules.Meetings.InternalEvents.Commands
 open FSharpPlus
 open FSharpPlus.Data
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Validation
+open MediatR
+open NServiceBus
+
+module Types =
+    [<CLIMutable>]
+    type ProposeMeetingGroupCommand =
+        {
+        Name: string
+        Description: string
+        LocationCity: string
+        LocationCountryCode: string
+        }
+        interface ICommand with
+        interface IRequest<Async<Result<unit,Error>>> with
 
 module Algebra =
     
@@ -41,23 +55,24 @@ module Algebra =
 
 module Implementation =
     open Algebra
+    open Types
     
     let saveMeetingGroupProposal m: Program<_> = SaveMeetingGroupProposal(m, ()) |> (Free.liftF << InL << InL)
     let publishProposedMeetingGroupEvent e: Program<_> = PublishMeetingGroupProposedEvent(e, ()) |> (Free.liftF << InL << InR)
     let logInfo s: Program<_> = LogInfo(s, ()) |> (Free.liftF << InR)
     
     let validate (cmd: ProposeMeetingGroupCommand) =
-        let n = Result.requireNotNull $"{nameof cmd.Name} must be not null" cmd.Name
-        let d = Result.requireNotNull $"{nameof cmd.Description} must be not null" cmd.Description
-        let lc = Result.requireNotNull $"{nameof cmd.LocationCity} must be not null" cmd.LocationCity
-        let lcc = Result.requireNotNull $"{nameof cmd.LocationCountryCode} must be not null" cmd.LocationCountryCode
+        let n = Result.requireNotNull {Target = nameof cmd.Name; Message = ["must be not null"]} cmd.Name
+        let d = Result.requireNotNull {Target = nameof cmd.Description; Message = ["must be not null"]} cmd.Description
+        let lc = Result.requireNotNull {Target = nameof cmd.LocationCity; Message = ["must be not null"]} cmd.LocationCity
+        let lcc = Result.requireNotNull {Target = nameof cmd.LocationCountryCode; Message = ["must be not null"]} cmd.LocationCountryCode
         let f _ _ _ _ = cmd
         let r = f <!^> n <*^> d <*^> lc <*^> lcc
         r
     
-    let handler (cmd: ProposeMeetingGroupCommand) now guid = monad {
-        let mgid = MeetingGroupProposalId guid
-        let uid = Guid.NewGuid()
+    let handler (cmd: ProposeMeetingGroupCommand) now g1 g2 = monad {
+        let mgid = MeetingGroupProposalId g1
+        let uid = g2
         let pd = now
         let m: MeetingGroupProposal = InVerificationMeetingGroupProposal({
             Id = mgid

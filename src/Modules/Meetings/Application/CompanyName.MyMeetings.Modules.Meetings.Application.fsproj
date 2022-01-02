@@ -38,8 +38,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Application\CompanyName.MyMeetings.BuildingBlocks.Application.fsproj" />
     <ProjectReference Include="..\Domain\CompanyName.MyMeetings.Modules.Meetings.Domain.fsproj" />
-    <ProjectReference Include="..\InternalEvents\CompanyName.MyMeetings.Modules.Meetings.InternalEvents.fsproj" />
   </ItemGroup>
 
 </Project>

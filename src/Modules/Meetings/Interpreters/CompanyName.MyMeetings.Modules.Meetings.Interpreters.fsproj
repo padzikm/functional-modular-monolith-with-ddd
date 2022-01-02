@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="CreateMember.fs" />
+    <Compile Include="ProposeMeetingGroup.fs" />
     <Compile Include="GetMember.fs" />
   </ItemGroup>
 

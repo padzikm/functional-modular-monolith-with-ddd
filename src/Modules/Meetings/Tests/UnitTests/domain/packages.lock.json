@@ -218,8 +218,8 @@
       },
       "NServiceBus": {
         "type": "Transitive",
-        "resolved": "7.5.0",
-        "contentHash": "0jxpgT7nGxyojjDjiZyntgCXH3YgIRag0PlwazKG3He9TjFhAr2+FvtHeUiylzvDpTaEbhtMY1RUbawGwHPMyA==",
+        "resolved": "7.6.0",
+        "contentHash": "L5WFleHtRrSmLf/z9+rJHOpaYs8xRPeuo3BNc7ujXygNb1IGP33PqnZAfNF35vPlQY0HQ/2he7b0K2KyoTL5PQ==",
         "dependencies": {
           "System.Reflection.Emit": "4.7.0",
           "System.Reflection.Emit.Lightweight": "4.7.0",
@@ -768,6 +768,12 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
+      "companyname.mymeetings.buildingblocks.application": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "5.0.0"
+        }
+      },
       "companyname.mymeetings.buildingblocks.domain": {
         "type": "Project",
         "dependencies": {
@@ -777,8 +783,8 @@
       "companyname.mymeetings.modules.meetings.application": {
         "type": "Project",
         "dependencies": {
+          "CompanyName.MyMeetings.BuildingBlocks.Application": "1.0.0",
           "CompanyName.MyMeetings.Modules.Meetings.Domain": "1.0.0",
-          "CompanyName.MyMeetings.Modules.Meetings.InternalEvents": "1.0.0",
           "Dapper": "2.0.78",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
@@ -794,16 +800,8 @@
           "CompanyName.MyMeetings.BuildingBlocks.Domain": "1.0.0",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
-          "FsToolkit.ErrorHandling": "2.1.2"
-        }
-      },
-      "companyname.mymeetings.modules.meetings.internalevents": {
-        "type": "Project",
-        "dependencies": {
-          "FSharp.Core": "5.0.0",
-          "FsToolkit.ErrorHandling": "2.11.1",
-          "MediatR": "9.0.0",
-          "NServiceBus": "7.5.0"
+          "FsToolkit.ErrorHandling": "2.1.2",
+          "NServiceBus": "7.6.0"
         }
       }
     }

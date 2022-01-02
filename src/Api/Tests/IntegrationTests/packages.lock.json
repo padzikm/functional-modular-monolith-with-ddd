@@ -106,6 +106,14 @@
         "resolved": "2.0.78",
         "contentHash": "vLPwL2HZXp/DN17Eu7sg6GMEj02alq7jcy6atn5Gv8i96b9Hu1UoxlCrhInUPfSFLQQiD8O7pdWAE1fdUEO/1Q=="
       },
+      "Hellang.Middleware.ProblemDetails": {
+        "type": "Transitive",
+        "resolved": "6.3.0",
+        "contentHash": "+IGpHrSpzqaaJmRSKT07PAfZAltcvIsmY7SM+IGl801fI1zQASmCwkSvc8qWa+/Sl6hiCYRiO/6iCUJb92mBog==",
+        "dependencies": {
+          "System.Reflection.Metadata": "5.0.0"
+        }
+      },
       "MediatR": {
         "type": "Transitive",
         "resolved": "9.0.0",
@@ -1133,8 +1141,8 @@
       },
       "System.Reflection.Metadata": {
         "type": "Transitive",
-        "resolved": "1.8.1",
-        "contentHash": "1wrPLtYQFUGTsl9OqPzdzmMRdQvo3PRK38y+4rCHG0f6iyvSYwNXVr0orMvsu2orOIiVbk6MMckINI1g54ZvfA=="
+        "resolved": "5.0.0",
+        "contentHash": "5NecZgXktdGg34rh1OenY1rFNDCI8xSjFr+Z4OU4cU06AQHUdRnIIEeWENu3Wl4YowbzkymAIMvi3WyK9U53pQ=="
       },
       "System.Reflection.Primitives": {
         "type": "Transitive",
@@ -1554,12 +1562,19 @@
           "FSharp.SystemTextJson": "0.16.6",
           "FSharpPlus": "1.1.7",
           "FsToolkit.ErrorHandling": "2.1.2",
+          "Hellang.Middleware.ProblemDetails": "6.3.0",
           "MediatR": "9.0.0",
           "MediatR.Extensions.Microsoft.DependencyInjection": "9.0.0",
           "Microsoft.EntityFrameworkCore": "5.0.12",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.12",
           "NServiceBus": "7.5.0",
           "NServiceBus.Extensions.Hosting": "1.1.0"
+        }
+      },
+      "companyname.mymeetings.buildingblocks.application": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "5.0.0"
         }
       },
       "companyname.mymeetings.buildingblocks.domain": {
@@ -1571,8 +1586,8 @@
       "companyname.mymeetings.modules.meetings.application": {
         "type": "Project",
         "dependencies": {
+          "CompanyName.MyMeetings.BuildingBlocks.Application": "1.0.0",
           "CompanyName.MyMeetings.Modules.Meetings.Domain": "1.0.0",
-          "CompanyName.MyMeetings.Modules.Meetings.InternalEvents": "1.0.0",
           "Dapper": "2.0.78",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
@@ -1588,7 +1603,8 @@
           "CompanyName.MyMeetings.BuildingBlocks.Domain": "1.0.0",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
-          "FsToolkit.ErrorHandling": "2.1.2"
+          "FsToolkit.ErrorHandling": "2.1.2",
+          "NServiceBus": "7.6.0"
         }
       },
       "companyname.mymeetings.modules.meetings.infrastructure": {
@@ -1596,15 +1612,6 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "5.0.12",
           "Microsoft.EntityFrameworkCore.SqlServer": "5.0.12"
-        }
-      },
-      "companyname.mymeetings.modules.meetings.internalevents": {
-        "type": "Project",
-        "dependencies": {
-          "FSharp.Core": "5.0.0",
-          "FsToolkit.ErrorHandling": "2.11.1",
-          "MediatR": "9.0.0",
-          "NServiceBus": "7.5.0"
         }
       },
       "companyname.mymeetings.modules.meetings.interpreters": {

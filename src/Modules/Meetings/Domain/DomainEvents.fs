@@ -2,8 +2,11 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Domain.DomainEvents
 
 open System
 open CompanyName.MyMeetings.Modules.Meetings.Domain
+open NServiceBus
 
-type MeetingGroupProposedDomainEvent = {
+[<CLIMutable>]
+type MeetingGroupProposedDomainEvent =
+    {
     Id: MeetingGroupProposalId
     Name: string
     Description: string
@@ -11,5 +14,6 @@ type MeetingGroupProposedDomainEvent = {
     ProposalDate: DateTime
     LocationCity: string
     LocationCountryCode: string
-}
+    }
+    interface IEvent with
     

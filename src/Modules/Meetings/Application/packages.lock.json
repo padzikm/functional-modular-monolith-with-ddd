@@ -200,6 +200,12 @@
           "System.Drawing.Common": "4.7.0"
         }
       },
+      "companyname.mymeetings.buildingblocks.application": {
+        "type": "Project",
+        "dependencies": {
+          "FSharp.Core": "5.0.0"
+        }
+      },
       "companyname.mymeetings.buildingblocks.domain": {
         "type": "Project",
         "dependencies": {
@@ -212,16 +218,8 @@
           "CompanyName.MyMeetings.BuildingBlocks.Domain": "1.0.0",
           "FSharp.Core": "5.0.0",
           "FSharpPlus": "1.1.7",
-          "FsToolkit.ErrorHandling": "2.1.2"
-        }
-      },
-      "companyname.mymeetings.modules.meetings.internalevents": {
-        "type": "Project",
-        "dependencies": {
-          "FSharp.Core": "5.0.0",
-          "FsToolkit.ErrorHandling": "2.11.1",
-          "MediatR": "9.0.0",
-          "NServiceBus": "7.5.0"
+          "FsToolkit.ErrorHandling": "2.1.2",
+          "NServiceBus": "7.6.0"
         }
       }
     }
