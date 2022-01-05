@@ -65,6 +65,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CompanyName.MyMeetings.BuildingBlocks.Application.UnitTests", "BuildingBlocks\Tests\UnitTests\Application\CompanyName.MyMeetings.BuildingBlocks.Application.UnitTests.fsproj", "{099E6607-1049-4C13-A329-CCBD3983E041}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Administration", "Administration", "{413146FC-9D5C-4204-B97B-D3C2AAEC4EEC}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CompanyName.MyMeetings.Modules.Administration.Service", "Modules\Administration\Service\CompanyName.MyMeetings.Modules.Administration.Service.fsproj", "{7BDA21A5-7440-4685-998A-24DDBEE2389F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -294,6 +298,18 @@ Global
 		{099E6607-1049-4C13-A329-CCBD3983E041}.Release|x64.Build.0 = Release|Any CPU
 		{099E6607-1049-4C13-A329-CCBD3983E041}.Release|x86.ActiveCfg = Release|Any CPU
 		{099E6607-1049-4C13-A329-CCBD3983E041}.Release|x86.Build.0 = Release|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Debug|x64.Build.0 = Debug|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Debug|x86.Build.0 = Debug|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Release|x64.ActiveCfg = Release|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Release|x64.Build.0 = Release|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Release|x86.ActiveCfg = Release|Any CPU
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CD20DF06-217A-48F7-A0B9-E814DABE9A42} = {CEC83FCF-2672-4003-BDA2-191BDEFA8253}
@@ -322,5 +338,7 @@ Global
 		{5E6AAC6F-958F-4D8E-B909-E2302F46881B} = {E4943366-9BB7-4E00-9A97-4E2F49FF0BF4}
 		{77789878-C64B-4CC3-9067-61586663537A} = {5E6AAC6F-958F-4D8E-B909-E2302F46881B}
 		{099E6607-1049-4C13-A329-CCBD3983E041} = {77789878-C64B-4CC3-9067-61586663537A}
+		{413146FC-9D5C-4204-B97B-D3C2AAEC4EEC} = {CEC83FCF-2672-4003-BDA2-191BDEFA8253}
+		{7BDA21A5-7440-4685-998A-24DDBEE2389F} = {413146FC-9D5C-4204-B97B-D3C2AAEC4EEC}
 	EndGlobalSection
 EndGlobal

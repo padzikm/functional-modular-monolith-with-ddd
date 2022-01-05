@@ -34,7 +34,7 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
         }
         
 type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, dbContext: MeetingsDbContext) =
-    let rec interpret (p: Program<_>) =
+    let rec interpret (p: Program<_>) (ctx:IMessageHandlerContext) =
         let go v =
             match v with
             | InL l ->
@@ -69,6 +69,7 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                     | PublishMeetingGroupProposedEvent (ev, i) ->
                         logger.LogInformation (sprintf "publish member created event %A" ev)
                         async {
+                            let! _ = ctx.Publish ev |> Async.AwaitTask
                             return i
                         }
             | InR r ->
@@ -86,7 +87,7 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                 logger.LogInformation "message received"
                 logger.LogInformation (sprintf "%A" message)
                 let program = handler message DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
-                let! result = interpret program
+                let! result = interpret program context
                 let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                 logger.LogInformation (sprintf "interpret result %A" result)
                 logger.LogInformation "message handled"

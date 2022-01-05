@@ -120,6 +120,16 @@
           "NServiceBus": "[7.2.0, 8.0.0)"
         }
       },
+      "NServiceBus.RabbitMQ": {
+        "type": "Direct",
+        "requested": "[6.1.1, )",
+        "resolved": "6.1.1",
+        "contentHash": "VTJadmRwXo8oEGnDToNfNVWkocIxqXfET5nJD7PvRTJDg+uTC0TW/P3wND2dtg3iAqGAIU4PVPlpIrMxrEGCSA==",
+        "dependencies": {
+          "NServiceBus": "[7.2.3, 8.0.0)",
+          "RabbitMQ.Client": "[6.1.0, 7.0.0)"
+        }
+      },
       "Dapper": {
         "type": "Transitive",
         "resolved": "2.0.78",
@@ -531,6 +541,15 @@
           "System.Xml.XmlDocument": "4.3.0"
         }
       },
+      "RabbitMQ.Client": {
+        "type": "Transitive",
+        "resolved": "6.1.0",
+        "contentHash": "XtiIVPRpcR82AWoe64Hh9gDHqBtheFuL/88YubNKkCpNcctkWFQjMlz3zTyf2lGvZouxCXarDm0nYhGBMbt58Q==",
+        "dependencies": {
+          "System.Memory": "4.5.4",
+          "System.Threading.Channels": "4.7.1"
+        }
+      },
       "runtime.native.System": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -867,6 +886,11 @@
           "System.Runtime.Extensions": "4.3.0",
           "System.Threading": "4.3.0"
         }
+      },
+      "System.Memory": {
+        "type": "Transitive",
+        "resolved": "4.5.4",
+        "contentHash": "1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw=="
       },
       "System.Net.NameResolution": {
         "type": "Transitive",
@@ -1253,6 +1277,11 @@
           "System.Runtime": "4.3.0",
           "System.Threading.Tasks": "4.3.0"
         }
+      },
+      "System.Threading.Channels": {
+        "type": "Transitive",
+        "resolved": "4.7.1",
+        "contentHash": "6akRtHK/wab3246t4p5v3HQrtQk8LboOt5T4dtpNgsp3zvDeM4/Gx8V12t0h+c/W9/enUrilk8n6EQqdQorZAA=="
       },
       "System.Threading.Tasks": {
         "type": "Transitive",

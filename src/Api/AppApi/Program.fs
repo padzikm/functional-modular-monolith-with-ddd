@@ -22,12 +22,14 @@ module Program =
             .UseNServiceBus(fun ctx ->
                 let endpoint = EndpointConfiguration("Api")
                 endpoint.SendOnly()
-                let transport = endpoint.UseTransport<LearningTransport>()
+                let t = endpoint.UseTransport<RabbitMQTransport>()
+                t.UseConventionalRoutingTopology() |> ignore
+                t.ConnectionString("host=localhost;port=5672;username=guest;password=guest") |> ignore
                 endpoint.UsePersistence<LearningPersistence>() |> ignore
-                let routing = transport.Routing()
+                let routing = t.Routing()
                 //let t = typeof<CreateMemberCommand>
-                routing.RouteToEndpoint(typeof<CreateMemberCommand>, "Meetings") |> ignore
-                routing.RouteToEndpoint(typeof<ProposeMeetingGroupCommand>, "Meetings") |> ignore
+                routing.RouteToEndpoint(typeof<CreateMemberCommand>.Assembly, "Meetings") |> ignore
+//                routing.RouteToEndpoint(typeof<ProposeMeetingGroupCommand>, "Meetings") |> ignore
                 endpoint
                 )
             .ConfigureWebHostDefaults(fun webBuilder ->

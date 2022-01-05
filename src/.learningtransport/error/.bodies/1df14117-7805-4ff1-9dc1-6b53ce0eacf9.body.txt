@@ -1,0 +1,2 @@
+<?xml version="1.0"?><MeetingGroupProposedDomainEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://tempuri.net/CompanyName.MyMeetings.Modules.Meetings.Domain.DomainEvents"><Id>
+</Id><Name>test</Name><Description>kljh</Description><ProposalUserId>a0b5f44c-2f44-4287-8f81-1b73be03404d</ProposalUserId><ProposalDate>2022-01-04T10:30:07.371972Z</ProposalDate><LocationCity>lkjshf</LocationCity><LocationCountryCode>lkjshdfl</LocationCountryCode></MeetingGroupProposedDomainEvent>

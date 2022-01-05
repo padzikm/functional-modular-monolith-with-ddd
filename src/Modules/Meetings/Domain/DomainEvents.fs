@@ -7,7 +7,7 @@ open NServiceBus
 [<CLIMutable>]
 type MeetingGroupProposedDomainEvent =
     {
-    Id: MeetingGroupProposalId
+    Id: Guid
     Name: string
     Description: string
     ProposalUserId: Guid

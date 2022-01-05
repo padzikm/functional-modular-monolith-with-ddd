@@ -87,7 +87,7 @@ module Implementation =
         })
         do! saveMeetingGroupProposal m
         let e: MeetingGroupProposedDomainEvent = {
-            Id = mgid
+            Id = g1
             Name = cmd.Name
             Description = cmd.Description
             ProposalUserId = uid

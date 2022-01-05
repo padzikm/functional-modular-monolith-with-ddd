@@ -1,0 +1,13 @@
+{
+  "NServiceBus.MessageId": "87b5e14d-9ae4-4edf-9b94-ae1400a5fb65",
+  "NServiceBus.MessageIntent": "Send",
+  "NServiceBus.ConversationId": "6ff674a9-19ff-46b6-82e2-ae1400a5fb67",
+  "NServiceBus.CorrelationId": "87b5e14d-9ae4-4edf-9b94-ae1400a5fb65",
+  "NServiceBus.OriginatingMachine": "MacBook-Pro-Magic",
+  "NServiceBus.OriginatingEndpoint": "Api",
+  "$.diagnostics.originating.hostid": "33ff79527c36232b91f4a4e68e1d9845",
+  "NServiceBus.ContentType": "text\/xml",
+  "NServiceBus.EnclosedMessageTypes": "CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types+ProposeMeetingGroupCommand, CompanyName.MyMeetings.Modules.Meetings.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+  "NServiceBus.Version": "7.5.0",
+  "NServiceBus.TimeSent": "2022-01-05 10:04:19:348965 Z"
+}

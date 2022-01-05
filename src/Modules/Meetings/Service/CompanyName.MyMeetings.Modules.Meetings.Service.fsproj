@@ -9,6 +9,12 @@
   <ItemGroup>
     <Compile Include="Worker.fs" />
     <Compile Include="Program.fs" />
+    <Content Include="scripts\MsSqlServer\Outbox_Create.sql" />
+    <Content Include="scripts\MsSqlServer\Timeout_Drop.sql" />
+    <Content Include="scripts\MsSqlServer\Subscription_Create.sql" />
+    <Content Include="scripts\MsSqlServer\Subscription_Drop.sql" />
+    <Content Include="scripts\MsSqlServer\Outbox_Drop.sql" />
+    <Content Include="scripts\MsSqlServer\Timeout_Create.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -19,6 +25,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="NServiceBus" Version="7.5.0" />
     <PackageReference Include="NServiceBus.Extensions.Hosting" Version="1.1.0" />
+    <PackageReference Include="NServiceBus.Persistence.Sql" Version="6.2.1" />
+    <PackageReference Include="NServiceBus.RabbitMQ" Version="6.1.1" />
   </ItemGroup>
 
   <ItemGroup>
