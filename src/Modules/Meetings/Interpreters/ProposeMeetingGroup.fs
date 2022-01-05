@@ -88,7 +88,7 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                 logger.LogInformation (sprintf "%A" message)
                 let program = handler message DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
                 let! result = interpret program context
-                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+//                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                 logger.LogInformation (sprintf "interpret result %A" result)
                 logger.LogInformation "message handled"
             } |> Async.StartAsTask :> Task

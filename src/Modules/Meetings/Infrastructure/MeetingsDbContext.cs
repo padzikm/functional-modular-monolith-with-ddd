@@ -20,7 +20,7 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Infrastructure
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=localhost;Database=MyMeetings;User Id=sa;Password=SqlServer2019;");
+            // optionsBuilder.UseSqlServer("Server=localhost;Database=MyMeetings;User Id=sa;Password=SqlServer2019;");
         }
     }
 }

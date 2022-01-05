@@ -17,12 +17,13 @@ module Program =
             .UseNServiceBus(fun ctx ->
                 let c = EndpointConfiguration("Administration")
                 c.EnableInstallers()
+                c.EnableOutbox() |> ignore
                 let t = c.UseTransport<RabbitMQTransport>()
                 t.UseConventionalRoutingTopology() |> ignore
                 t.ConnectionString("host=localhost;port=5672;username=guest;password=guest") |> ignore
                 let p = c.UsePersistence<SqlPersistence>()
                 let d = p.SqlDialect<SqlDialect.MsSqlServer>()  
-                d.Schema("administration_bus")
+//                d.Schema("administration_bus")
                 p.ConnectionBuilder(fun () ->
                     let con = SqlConnection("Server=localhost;Database=MyMeetings;User Id=sa;Password=SqlServer2019;")
                     con :> DbConnection
