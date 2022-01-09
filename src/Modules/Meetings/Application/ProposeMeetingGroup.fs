@@ -12,6 +12,11 @@ open FsToolkit.ErrorHandling.Operator.Validation
 open MediatR
 open NServiceBus
 
+module ValueTypes = 
+    type Name = private Name of string
+    
+    let create s = failwith "ops"
+
 module Types =
     [<CLIMutable>]
     type ProposeMeetingGroupCommand =

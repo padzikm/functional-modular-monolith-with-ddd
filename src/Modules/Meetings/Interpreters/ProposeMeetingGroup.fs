@@ -33,6 +33,7 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
             return j
         }
         
+        
 type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, dbContext: MeetingsDbContext) =
     let rec interpret (p: Program<_>) (ctx:IMessageHandlerContext) =
         let go v =

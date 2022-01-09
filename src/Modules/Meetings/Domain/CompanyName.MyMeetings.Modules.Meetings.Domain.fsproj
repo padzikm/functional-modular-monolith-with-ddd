@@ -11,6 +11,7 @@
     <Compile Include="Members\Events.fs" />
     <Compile Include="Members\Member.fs" />
     <Compile Include="DomainTypes.fs" />
+    <Compile Include="SimpleTypes.fs" />
     <Compile Include="DomainEvents.fs" />
   </ItemGroup>
 
