@@ -2,40 +2,68 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Domain.SimpleTypes
 
 open FSharpPlus
 open FSharpPlus.Data
+open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Validation
+open CompanyName.MyMeetings.BuildingBlocks.Domain.Errors
 
 module Helpers =
-    let checkEmpty msg v =
+    let checkNotNull v =
+        if v = null then
+            Error (StringError Null)
+        else
+            Ok v
+    
+    let checkNotEmpty v =
         if v = "" then
-            Error msg
+            Error (StringError Empty)
         else
             Ok v
             
-    let checkLength l msg (v:string) =
+    let checkMaxLength l (v:string) =
         if v.Length > l then
-            Error msg
+            Error (StringError (MaxLengthExceeded l))
         else
             Ok v
             
-    let checkContains (c:string) msg (v:string) =
+    let checkNotContains (c:string) er (v:string) =
         if v.Contains(c) then
-            Error msg
+            Error (StringError er)
         else
             Ok v
 
-type MeetingsName = private MeetingsName of string
+type MeetingName = private MeetingName of string
 
-module MeetingsName =
+module MeetingName =
     open Helpers
     
     let create s =
-        let c _ _ s = MeetingsName s
-        c            
-        <!^> checkEmpty "not empty" s
-        <*^> checkLength 1024 "at most 1024 chars" s
-        <*^> checkContains "\n" "not contains new line" s
+        let c _ _ st = MeetingName st
+        result{
+            let! sv = checkNotNull s |> Result.mapError (fun e -> [e])
+            return! c
+                <!^> checkNotEmpty sv
+                <*^> checkMaxLength 1024 sv
+                <*^> checkNotContains "\n" ContainsNewline sv
+        }
+        
+       
     
-    let value (MeetingsName s) = s
+    let value (MeetingName s) = s
     
-    let map f (MeetingsName s) = MeetingsName (f s)
+    let map f (MeetingName s) = MeetingName (f s)
     
+type MeetingLocationCity = private MeetingLocationCity of string
+
+module MeetingLocationCity =
+    
+    let create c: Validation<MeetingLocationCity, ValidationError> =
+//        failwith ""
+        Ok (MeetingLocationCity c)
+        
+type MeetingLocationPostcode = private MeetingLocationPostcode of string
+
+module MeetingLocationPostcode =
+    
+    let create c: Validation<MeetingLocationPostcode, ValidationError> =
+//        failwith ""
+        Ok (MeetingLocationPostcode c)

@@ -3,8 +3,10 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGrou
 open System
 open System
 open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
+open CompanyName.MyMeetings.BuildingBlocks.Domain.Errors
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open CompanyName.MyMeetings.Modules.Meetings.Domain.DomainEvents
+open CompanyName.MyMeetings.Modules.Meetings.Domain.SimpleTypes
 open FSharpPlus
 open FSharpPlus.Data
 open FsToolkit.ErrorHandling
@@ -12,12 +14,9 @@ open FsToolkit.ErrorHandling.Operator.Validation
 open MediatR
 open NServiceBus
 
-module ValueTypes = 
-    type Name = private Name of string
-    
-    let create s = failwith "ops"
-
 module Types =
+    open CompanyName.MyMeetings.BuildingBlocks
+    
     [<CLIMutable>]
     type ProposeMeetingGroupCommand =
         {
@@ -28,6 +27,30 @@ module Types =
         }
         interface ICommand with
         interface IRequest<Async<Result<unit,Error>>> with
+        
+    type ProposeMeetingGroupCommandInternal =
+        {
+        Name: MeetingName
+        Description: string option
+        LocationCity: MeetingLocationCity
+        LocationPostcode: MeetingLocationPostcode
+        }
+        interface ICommand with
+        
+    type ValidationError = {
+        Target: string
+        Errors: Domain.Errors.ValidationError list
+    }
+        
+    let createCmd n d lc lpc =
+        let f n d lc lpc =
+            {Name = n; Description = d; LocationCity = lc; LocationPostcode = lpc}
+            
+        f
+        <!^> (MeetingName.create n |> Result.mapError (fun er -> {Target = "name"; Errors = er }))
+        <*^> Ok (if d = null then None else Some d)
+        <*^> (MeetingLocationCity.create lc |> Result.mapError (fun er -> {Target = "location city"; Errors = er }))
+        <*^> (MeetingLocationPostcode.create lpc |> Result.mapError (fun er -> {Target = "location postcode"; Errors = er }))
 
 module Algebra =
     

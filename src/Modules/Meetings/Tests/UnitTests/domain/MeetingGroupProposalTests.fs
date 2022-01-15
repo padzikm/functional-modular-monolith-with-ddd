@@ -74,70 +74,72 @@ let interpret (p: ProposeMeetingGroup.Algebra.Program<_>) =
             Free.fold go p
 
 
-type MeetingsNameTests(output: ITestOutputHelper) =
+type MeetingNameTests(output: ITestOutputHelper) =
     
     [<Fact>]
     let ``some``() =
-        let mr = MeetingsName.create "some name"
+        let mr = MeetingName.create "some name"
         
         match mr with
         | Ok m ->
-            let v = MeetingsName.value m
+            let v = MeetingName.value m
             v |> should equal "some name"
-        | _ -> mr |> should be (ofCase<@ Ok Unchecked.defaultof<MeetingsName> @>)
+        | _ -> mr |> should be (ofCase<@ Ok Unchecked.defaultof<MeetingName> @>)
         
     [<Fact>]
     let ``at most 1024 chars``() =
         let s = String.replicate 1024 "d"
-        let mr = MeetingsName.create s
+        let mr = MeetingName.create s
         
         match mr with
         | Ok m ->
-            let v = MeetingsName.value m
+            let v = MeetingName.value m
             v |> should equal s
-        | _ -> mr |> should be (ofCase<@ Ok Unchecked.defaultof<MeetingsName> @>)
+        | _ -> mr |> should be (ofCase<@ Ok Unchecked.defaultof<MeetingName> @>)
 
     [<Fact>]
-    let ``empty``() =
-        let mr = MeetingsName.create ""
+    let ``null``() =
+        let mr = MeetingName.create null
         
         match mr with
-        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingsName, string list> @>)
-        | Error er ->
-            er.Length |> should equal 1
-            er.Head |> should not' (be NullOrEmptyString)
+        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingName, string list> @>)
+        | Error er -> er.Length |> should equal 1
+    
+    [<Fact>]
+    let ``empty``() =
+        let mr = MeetingName.create ""
+        
+        match mr with
+        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingName, string list> @>)
+        | Error er -> er.Length |> should equal 1
         
     [<Fact>]
     let ``newline``() =
-        let mr = MeetingsName.create @"ad
+        let mr = MeetingName.create @"ad
 fs"
         
         match mr with
-        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingsName, string list> @>)
-        | Error er ->
-            er.Length |> should equal 1
-            er.Head |> should not' (be NullOrEmptyString)
+        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingName, string list> @>)
+        | Error er -> er.Length |> should equal 1
         
     [<Fact>]
     let ``more than 1024 chars``() =
         let s = String.replicate 1025 "d"
-        let mr = MeetingsName.create s
+        let mr = MeetingName.create s
         
         match mr with
-        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingsName, string list> @>)
-        | Error er ->
-            er.Length |> should equal 1
-            er.Head |> should not' (be NullOrEmptyString)
+        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingName, string list> @>)
+        | Error er -> er.Length |> should equal 1
         
     [<Fact>]
     let ``combine newline and more than 1024 chars``() =
         let s = (String.replicate 600 "a" + @"
 " + String.replicate 800 "b")
         
-        let mr = MeetingsName.create s
+        let mr = MeetingName.create s
         
         match mr with
-        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingsName, string list> @>)
+        | Ok _ -> mr |> should be (ofCase<@ Error Unchecked.defaultof<string list> :> Result<MeetingName, string list> @>)
         | Error er -> er.Length |> should equal 2
         
         

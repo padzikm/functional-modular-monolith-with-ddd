@@ -6,13 +6,15 @@ open System.Data.Common
 open System.Linq
 open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
+open CompanyName.MyMeetings.Modules.Meetings.Interpreters.ProposeMeetingGroup
 open Microsoft.Data.SqlClient
-open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
-open NServiceBus
 open NServiceBus.ObjectBuilder
 open NServiceBus.Persistence.Sql
 open Microsoft.EntityFrameworkCore
+open NServiceBus
+open NServiceBus.MessageMutator
+open Microsoft.Extensions.DependencyInjection
 open NServiceBus.Persistence.Sql
 
 module Program =
@@ -40,6 +42,7 @@ module Program =
                         s.OnSaveChanges(fun ss -> dbctx.SaveChangesAsync() :> Task)
                         dbctx
                         ), DependencyLifecycle.InstancePerUnitOfWork))
+                let _ = endpoint.RegisterMessageMutator(ProposeMeetingGroupCmdMutator())
                 endpoint
                 )
 //            .ConfigureServices(fun ctx services ->

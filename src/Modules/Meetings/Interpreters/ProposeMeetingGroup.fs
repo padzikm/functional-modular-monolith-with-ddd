@@ -2,6 +2,7 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Interpreters.ProposeMeetingGro
 
 open System
 open System.Threading.Tasks
+open System.Threading.Tasks
 open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Algebra
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
@@ -9,14 +10,18 @@ open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Imp
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Database
 open FSharpPlus
+open FSharpPlus
 open FSharpPlus.Data
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.Result
 open MediatR
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Logging
 open NServiceBus
 open FsToolkit.ErrorHandling.Operator.Validation
 open CompanyName.MyMeetings.Modules.Meetings.Domain
+open NServiceBus.Logging
+open NServiceBus.MessageMutator
 
 type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, msgSession: IMessageSession) =
     inherit RequestHandler<ProposeMeetingGroupCommand, Async<Result<unit, Error>>>()
@@ -32,7 +37,28 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
             let j = Result.flatten u
             return j
         }
-        
+
+type ProposeMeetingGroupCmdMutator() =
+    interface IMutateIncomingMessages with
+        member this.MutateIncoming(context) =
+            let l = LogManager.GetLogger<ProposeMeetingGroupCmdMutator>()
+            l.Info "w mutatorze propose meeting group"
+            match context.Message with
+            | :? ProposeMeetingGroupCommand as cmd ->
+                l.Info "pasuje"
+                let c = createCmd cmd.Name cmd.Description cmd.LocationCity cmd.LocationCountryCode
+                match c with
+                | Ok d ->
+                    l.Info "jest ok"
+                    context.Message <- d
+                    Task.CompletedTask        
+                | Error e ->
+                    l.Info "nie jest ok"
+                    Task.FromException(exn(sprintf "%O" e))
+//                    failwith (sprintf "%O" e)
+            | _ ->
+                l.Info "nie pasuje"
+                Task.CompletedTask
         
 type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, dbContext: MeetingsDbContext) =
     let rec interpret (p: Program<_>) (ctx:IMessageHandlerContext) =
@@ -91,5 +117,18 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                 let! result = interpret program context
 //                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
                 logger.LogInformation (sprintf "interpret result %A" result)
+                logger.LogInformation "message handled"
+            } |> Async.StartAsTask :> Task
+            
+    interface IHandleMessages<ProposeMeetingGroupCommandInternal> with
+        member this.Handle(message, context) =
+            async {
+                logger.LogInformation "internal"
+                logger.LogInformation "message received"
+                logger.LogInformation (sprintf "%A" message)
+//                let program = handler message DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
+//                let! result = interpret program context
+//                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+//                logger.LogInformation (sprintf "interpret result %A" result)
                 logger.LogInformation "message handled"
             } |> Async.StartAsTask :> Task

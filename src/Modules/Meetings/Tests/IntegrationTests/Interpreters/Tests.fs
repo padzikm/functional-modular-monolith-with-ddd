@@ -1,6 +1,7 @@
 module Tests
 
 open System
+open System.Collections.Generic
 open System.Threading
 open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
@@ -9,15 +10,63 @@ open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
 open CompanyName.MyMeetings.Modules.Meetings.Interpreters.CreateMember
 open CompanyName.MyMeetings.Modules.Meetings.Interpreters.ProposeMeetingGroup
 open FSharpPlus
+open FSharpPlus
 open MediatR
 open Microsoft.EntityFrameworkCore
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging.Abstractions
-open NServiceBus
+open NServiceBus.MessageMutator
+open NServiceBus.MessageMutator
 open NServiceBus.Testing
 open Xunit
 open FsUnit.Xunit
+open NServiceBus
 open FsUnit.CustomMatchers
+
+[<Fact>]
+let ``msg mutator``() =
+    let m = ProposeMeetingGroupCmdMutator()
+    let cmd: ProposeMeetingGroupCommand = {
+        Name = "adsf"
+        Description = "adf"
+        LocationCity = "qwer"
+        LocationCountryCode = "lkjh"
+    }
+//    let d = Dictionary<string,string>()
+    let c = MutateIncomingMessageContext(cmd, Dictionary<string,string>())
+    async {
+        do! (m :> IMutateIncomingMessages).MutateIncoming(c) |> Async.AwaitTask
+        c.Message |> should not' (equal cmd)
+    }
+  
+[<Fact>]
+let ``msg mutator null``() =
+    let m = ProposeMeetingGroupCmdMutator()
+    let cmd: ProposeMeetingGroupCommand = {
+        Name = String.replicate 1025 "q"
+        Description = "adf"
+        LocationCity = "qwer"
+        LocationCountryCode = "lkjh"
+    }
+//    let d = Dictionary<string,string>()
+    let c = MutateIncomingMessageContext(cmd, Dictionary<string,string>())
+    async {
+        do! (m :> IMutateIncomingMessages).MutateIncoming(c) |> Async.AwaitTask
+        c.Message |> should not' (equal cmd)
+    }
+
+type Sth = {Tmp: string}
+
+[<Fact>]
+let ``msg mutator other``() =
+    let m = ProposeMeetingGroupCmdMutator()
+    let cmd: Sth = {Tmp = "asdf"}
+//    let d = Dictionary<string,string>()
+    let c = MutateIncomingMessageContext(cmd, Dictionary<string,string>())
+    async {
+        do! (m :> IMutateIncomingMessages).MutateIncoming(c) |> Async.AwaitTask
+        c.Message |> should equal cmd
+    }
 
 [<Fact>]
 let ``create member cmd interpreter`` () =
