@@ -771,6 +771,7 @@
       "companyname.mymeetings.buildingblocks.application": {
         "type": "Project",
         "dependencies": {
+          "CompanyName.MyMeetings.BuildingBlocks.Domain": "1.0.0",
           "FSharp.Core": "5.0.0"
         }
       },

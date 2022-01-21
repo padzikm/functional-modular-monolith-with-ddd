@@ -60,6 +60,8 @@ module MeetingLocationCity =
 //        failwith ""
         Ok (MeetingLocationCity c)
         
+    let value (MeetingLocationCity lc) = lc
+        
 type MeetingLocationPostcode = private MeetingLocationPostcode of string
 
 module MeetingLocationPostcode =
@@ -67,3 +69,5 @@ module MeetingLocationPostcode =
     let create c: Validation<MeetingLocationPostcode, ValidationError> =
 //        failwith ""
         Ok (MeetingLocationPostcode c)
+        
+    let value (MeetingLocationPostcode lpc) = lpc

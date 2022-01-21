@@ -1,30 +1,28 @@
 namespace CompanyName.MyMeetings.BuildingBlocks.Application.Errors
 
 open System
+open CompanyName.MyMeetings.BuildingBlocks.Domain.Errors
 
-type ValidationError = {
+type TargetedValidationError = {
     Target: string
-    Message: string list
-}
-
-type InvalidCommandError = {
-    ValidationErrors: ValidationError list
+    Errors: ValidationError list
 }
 
 type Error =
-    | InvalidCommandError of InvalidCommandError
+    | CommandValidationError of TargetedValidationError list
     | InfrastructureError of exn
     
 module Helpers =
-    let toMap (cmdErr: InvalidCommandError) =
         
-        let rec go (ver: ValidationError list) =
+    let toMap (cmdErr: TargetedValidationError list) =
+        
+        let rec go (ver: TargetedValidationError list) =
             if ver.Length = 0 then
                 Seq.empty
             elif ver.Length = 1 then
                 let h = ver.Head
                 seq {
-                    (h.Target, Array.ofList h.Message)
+                    (h.Target, Array.ofList h.Errors)
                 }
             else
                 let h = ver.Head
@@ -34,6 +32,6 @@ module Helpers =
                     yield! go t
                 }
         
-        let r = go cmdErr.ValidationErrors
+        let r = go cmdErr
         Map(r)
     

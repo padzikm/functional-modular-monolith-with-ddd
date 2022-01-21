@@ -2,6 +2,8 @@ namespace CompanyName.MyMeetings.Api.Controllers.MeetingGroupProposalController
 
 open System
 open System.Collections.Generic
+open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
+open CompanyName.MyMeetings.BuildingBlocks.Domain.Errors
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
 open FsToolkit.ErrorHandling
 open FsToolkit.ErrorHandling.Operator.AsyncResult
@@ -34,10 +36,19 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
         let q = y |> Async.join
         q
     
+    let mapValidationErrorToString (err: ValidationError) =
+        match err with
+        | StringError strerr ->
+            match strerr with
+            | Null -> "cannot be null"
+            | Empty -> "cannot be empty"
+            | MaxLengthExceeded m -> $"cannot exceed ${m} characters"
+            | ContainsNewline -> "cannot contains new line"
+    
     let mapError (err: Error) =
         match err with
-        | InvalidCommandError verr ->
-            let dict = Helpers.toMap verr
+        | CommandValidationError verr ->
+            let dict = Helpers.toMap verr |> Map.mapValues (Array.map mapValidationErrorToString)
             this.ValidationProblem(ValidationProblemDetails(dict))
         | InfrastructureError dberr ->
             InfrastructureErrorResult(dberr) :> ActionResult

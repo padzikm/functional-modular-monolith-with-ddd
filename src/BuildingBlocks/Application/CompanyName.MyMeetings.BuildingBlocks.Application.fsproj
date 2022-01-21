@@ -11,4 +11,8 @@
     <Compile Include="Algebra.fs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Domain\CompanyName.MyMeetings.BuildingBlocks.Domain.fsproj" />
+  </ItemGroup>
+
 </Project>

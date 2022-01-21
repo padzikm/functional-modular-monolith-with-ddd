@@ -1,6 +1,7 @@
 namespace CompanyName.MyMeetings.Modules.Meetings.Domain
 
 open System
+open CompanyName.MyMeetings.Modules.Meetings.Domain.SimpleTypes
 
 type Member = {
     MemberId: Guid
@@ -13,16 +14,16 @@ type Member = {
 }
 
 type MeetingGroupLocation = {
-    City: string
-    CountryCode: string
+    City: MeetingLocationCity
+    Postcode: MeetingLocationPostcode
 }
 
 type MeetingGroupProposalId = MeetingGroupProposalId of Guid
 
 type MeetingGroupProposalDetails = {
     Id: MeetingGroupProposalId
-    Name: string
-    Description: string
+    Name: MeetingName
+    Description: string option
     ProposalMemberId: Guid
     ProposalDate: DateTime
     Location: MeetingGroupLocation

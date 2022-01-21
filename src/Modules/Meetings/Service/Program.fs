@@ -42,7 +42,7 @@ module Program =
                         s.OnSaveChanges(fun ss -> dbctx.SaveChangesAsync() :> Task)
                         dbctx
                         ), DependencyLifecycle.InstancePerUnitOfWork))
-                let _ = endpoint.RegisterMessageMutator(ProposeMeetingGroupCmdMutator())
+//                let _ = endpoint.RegisterMessageMutator(ProposeMeetingGroupCmdMutator())
                 endpoint
                 )
 //            .ConfigureServices(fun ctx services ->

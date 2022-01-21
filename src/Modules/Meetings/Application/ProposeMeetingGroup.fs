@@ -35,22 +35,16 @@ module Types =
         LocationCity: MeetingLocationCity
         LocationPostcode: MeetingLocationPostcode
         }
-        interface ICommand with
         
-    type ValidationError = {
-        Target: string
-        Errors: Domain.Errors.ValidationError list
-    }
-        
-    let createCmd n d lc lpc =
+    let createCmd (cmd: ProposeMeetingGroupCommand) =
         let f n d lc lpc =
             {Name = n; Description = d; LocationCity = lc; LocationPostcode = lpc}
             
         f
-        <!^> (MeetingName.create n |> Result.mapError (fun er -> {Target = "name"; Errors = er }))
-        <*^> Ok (if d = null then None else Some d)
-        <*^> (MeetingLocationCity.create lc |> Result.mapError (fun er -> {Target = "location city"; Errors = er }))
-        <*^> (MeetingLocationPostcode.create lpc |> Result.mapError (fun er -> {Target = "location postcode"; Errors = er }))
+        <!^> (MeetingName.create cmd.Name |> Result.mapError (fun er -> {Target = nameof cmd.Name; Errors = er }))
+        <*^> Ok (if cmd.Description = null then None else Some cmd.Description)
+        <*^> (MeetingLocationCity.create cmd.LocationCity |> Result.mapError (fun er -> {Target = nameof cmd.LocationCity; Errors = er }))
+        <*^> (MeetingLocationPostcode.create cmd.LocationCountryCode |> Result.mapError (fun er -> {Target = nameof cmd.LocationCountryCode; Errors = er }))
 
 module Algebra =
     
@@ -63,7 +57,7 @@ module Algebra =
             | SaveMeetingGroupProposal (m, a) -> SaveMeetingGroupProposal(m, f a)
             
     type DomainEventInstruction<'A> =
-        | PublishMeetingGroupProposedEvent of e: MeetingGroupProposedDomainEvent * 'A
+        | PublishMeetingGroupProposedEvent of e: MeetingGroupProposedDomainEventInternal * 'A
         
     type DomainEventInstruction<'A> with
         static member Map(x: DomainEventInstruction<'A>, f: 'A -> 'B) =
@@ -89,39 +83,48 @@ module Implementation =
     let publishProposedMeetingGroupEvent e: Program<_> = PublishMeetingGroupProposedEvent(e, ()) |> (Free.liftF << InL << InR)
     let logInfo s: Program<_> = LogInfo(s, ()) |> (Free.liftF << InR)
     
+//    let validate2 (cmd: ProposeMeetingGroupCommand) =
+//        let n = Result.requireNotNull {Target = nameof cmd.Name; Message = ["must be not null"]} cmd.Name
+//        let d = Result.requireNotNull {Target = nameof cmd.Description; Message = ["must be not null"]} cmd.Description
+//        let lc = Result.requireNotNull {Target = nameof cmd.LocationCity; Message = ["must be not null"]} cmd.LocationCity
+//        let lcc = Result.requireNotNull {Target = nameof cmd.LocationCountryCode; Message = ["must be not null"]} cmd.LocationCountryCode
+//        let f _ _ _ _ = cmd
+//        let r = f <!^> n <*^> d <*^> lc <*^> lcc
+//        r
+        
     let validate (cmd: ProposeMeetingGroupCommand) =
-        let n = Result.requireNotNull {Target = nameof cmd.Name; Message = ["must be not null"]} cmd.Name
-        let d = Result.requireNotNull {Target = nameof cmd.Description; Message = ["must be not null"]} cmd.Description
-        let lc = Result.requireNotNull {Target = nameof cmd.LocationCity; Message = ["must be not null"]} cmd.LocationCity
-        let lcc = Result.requireNotNull {Target = nameof cmd.LocationCountryCode; Message = ["must be not null"]} cmd.LocationCountryCode
-        let f _ _ _ _ = cmd
-        let r = f <!^> n <*^> d <*^> lc <*^> lcc
-        r
+        let c = createCmd cmd
+        (fun _ -> cmd) <!> c
+        
+    let validate2 (cmd: ProposeMeetingGroupCommand) =
+//        let c = createCmd cmd
+        let t = Validation.ok cmd
+        t
     
-    let handler (cmd: ProposeMeetingGroupCommand) now g1 g2 = monad {
+    let handler (cmd: ProposeMeetingGroupCommandInternal) now g1 g2 = monad {
         let mgid = MeetingGroupProposalId g1
         let uid = g2
         let pd = now
         let m: MeetingGroupProposal = InVerificationMeetingGroupProposal({
             Id = mgid
             Name = cmd.Name
-            Description = cmd.Description          
+            Description = cmd.Description     
             ProposalDate = pd
             ProposalMemberId = uid
             Location = {
                 City = cmd.LocationCity
-                CountryCode = cmd.LocationCountryCode
+                Postcode = cmd.LocationPostcode
             }
         })
         do! saveMeetingGroupProposal m
-        let e: MeetingGroupProposedDomainEvent = {
-            Id = g1
+        let e: MeetingGroupProposedDomainEventInternal = {
+            Id = mgid
             Name = cmd.Name
             Description = cmd.Description
             ProposalUserId = uid
             ProposalDate = pd
             LocationCity = cmd.LocationCity
-            LocationCountryCode = cmd.LocationCountryCode
+            LocationPostcode = cmd.LocationPostcode
         }
         do! logInfo "meeting group proposal created!"
         do! publishProposedMeetingGroupEvent e
