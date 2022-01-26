@@ -7,6 +7,7 @@ open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Algebra
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Implementation
+open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
 open CompanyName.MyMeetings.Modules.Meetings.Domain.DomainEvents
 open CompanyName.MyMeetings.Modules.Meetings.Domain.SimpleTypes
 open CompanyName.MyMeetings.Modules.Meetings.Infrastructure
@@ -28,14 +29,26 @@ open NServiceBus.MessageMutator
 //type ProposeMeetingGroupCommandSender (logger: ILogger<ProposeMeetingGroupCommandSender>, msgSession: IMessageSession) =
 //    inherit RequestHandler<ProposeMeetingGroupCommandInternal, Async<unit>>()
        
-
-type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, msgSession: IMessageSession) =
-    inherit RequestHandler<ProposeMeetingGroupCommand, Async<Result<unit, Error>>>()
-
-    override this.Handle(request) =
-        let f (req: ProposeMeetingGroupCommand) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
-        let v = validate request
-        let q = f <!> v
+[<CLIMutable>]
+    type ProposeMeetingGroupCommandDto =
+        {
+        Id: Guid
+        Name: string
+        Description: string
+        LocationCity: string
+        LocationCountryCode: string
+        MemberId: Guid
+        }
+        interface ICommand with
+       
+[<AbstractClass>]
+type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<unit, Error>>> and 'b :> ICommand> (logger: ILogger, msgSession: IMessageSession) =
+    inherit RequestHandler<'a, Async<Result<unit, Error>>>()
+    
+    default this.Handle(request) =
+        let f (req: 'b) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
+        let v = this.validate request
+        let q = f <!> (this.convertToDto <!> v)
         async {
             let s = Result.sequenceAsync q
             let! r = s
@@ -43,6 +56,40 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
             let j = Result.flatten u
             return j
         }
+        
+    abstract member validate: 'a -> Result<'a, TargetedValidationError list>
+    
+    abstract member convertToDto: 'a -> 'b
+
+type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, msgSession: IMessageSession) =
+    inherit CommandValidator<ProposeMeetingGroupCommand, ProposeMeetingGroupCommandDto>(logger, msgSession)
+
+//    default this.Handle(request) =
+//        let f (req: ProposeMeetingGroupCommand) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
+//        let v = validate request
+//        let q = f <!> v
+//        async {
+//            let s = Result.sequenceAsync q
+//            let! r = s
+//            let u = r |> Result.mapError CommandValidationError
+//            let j = Result.flatten u
+//            return j
+//        }
+
+    override this.validate a =
+        let c = createCmd a {|Id = Guid.NewGuid(); MemberId = Guid.NewGuid()|}
+        (fun _ -> a) <!> c
+        
+    override this.convertToDto b =
+        let c = {
+            Id = Guid.NewGuid()
+            Name = b.Name
+            Description = b.Description
+            LocationCity = b.LocationCity
+            LocationCountryCode = b.LocationCountryCode
+            MemberId = Guid.NewGuid()
+        }
+        c
 
 //type ProposeMeetingGroupCmdMutator() =
 //    interface IMutateIncomingMessages with
@@ -65,6 +112,7 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
 //            | _ ->
 //                l.Info "nie pasuje"
 //                Task.CompletedTask
+        
         
 type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, dbContext: MeetingsDbContext) =
     let rec interpret (p: Program<_>) (ctx:IMessageHandlerContext) =
@@ -99,14 +147,14 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                             }
                 | InR evi ->
                     match evi with
-                    | PublishMeetingGroupProposedEvent (evi, i) ->
-                        logger.LogInformation (sprintf "publish member created event %A" evi)
+                    | PublishMeetingGroupProposedEvent (eve, i) ->
+                        logger.LogInformation (sprintf "publish member created event %A" eve)
                         async {
-                            let (MeetingGroupProposalId id) = evi.Id
+                            let (MeetingGroupProposalId id) = eve.Id
                             let ev: MeetingGroupProposedDomainEvent = {
-                                Id = id; Name = MeetingName.value evi.Name; Description = Option.defaultValue "" evi.Description
-                                ProposalUserId = evi.ProposalUserId; ProposalDate = evi.ProposalDate
-                                LocationCity = MeetingLocationCity.value evi.LocationCity; LocationPostcode = MeetingLocationPostcode.value evi.LocationPostcode
+                                Id = id; Name = MeetingName.value eve.Name; Description = Option.defaultValue "" eve.Description
+                                ProposalUserId = eve.ProposalUserId; ProposalDate = eve.ProposalDate
+                                LocationCity = MeetingLocationCity.value eve.LocationCity; LocationPostcode = MeetingLocationPostcode.value eve.LocationPostcode
                             }
                             let! _ = ctx.Publish ev |> Async.AwaitTask
                             return i
@@ -126,7 +174,12 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                 let r = result{
                     logger.LogInformation "message received"
                     logger.LogInformation (sprintf "%A" message)
-                    let! msgInternal = createCmd message
+                    let c = { Name = message.Name
+                              Description = message.Description
+                              LocationCity = message.LocationCity
+                              LocationCountryCode = message.LocationCountryCode }
+                    
+                    let! msgInternal = createCmd c {|Id = Guid.NewGuid(); MemberId = Guid.NewGuid()|}
                     let program = handler msgInternal DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
                     return interpret program context
                 }

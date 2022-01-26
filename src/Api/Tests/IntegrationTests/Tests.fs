@@ -118,6 +118,23 @@ type Tests (output: ITestOutputHelper) =
             output.WriteLine(res)
             value.IsSuccessStatusCode |> should equal true
         }
+        
+    [<Fact>]
+    let ``get twice returns same result`` () =
+        let client = serverFactory.CreateClient()
+        async {
+            let g = Guid.Parse("EA0231DF-12A7-475C-A1B1-53F9EF0297B7")
+            let uri = $"/meetings/{g}"
+            let! value1 = client.GetAsync(uri) |> Async.AwaitTask
+            let! res1 = value1.Content.ReadAsStringAsync() |> Async.AwaitTask
+            output.WriteLine(res1)
+            let! value2 = client.GetAsync(uri) |> Async.AwaitTask
+            let! res2 = value2.Content.ReadAsStringAsync() |> Async.AwaitTask
+            output.WriteLine(res2)
+            value1.IsSuccessStatusCode |> should equal true
+            value1.StatusCode |> should equal value2.StatusCode
+            res1 |> should equal res2
+        }
 
     [<Fact>]
     let ``edit meeting to be paid`` () =

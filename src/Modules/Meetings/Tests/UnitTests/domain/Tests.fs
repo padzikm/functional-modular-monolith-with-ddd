@@ -4,6 +4,7 @@ open System
 open CompanyName.MyMeetings.BuildingBlocks.Domain
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Algebra
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
+open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open FSharpPlus.Data
@@ -56,6 +57,13 @@ type MyGens =
         
 type Tests (output: ITestOutputHelper) =
     
+    [<Fact>]
+    let ``state``() =
+        let r = Statee.as1 "a"
+        
+        output.WriteLine (sprintf "%A" (fst r))
+        output.WriteLine (sprintf "%A" (snd r))
+        true |> should equal true
 
 //    do Arb.register<MyGens>() |> ignore
     

@@ -3,6 +3,7 @@ module Tests
 open System
 open System.Collections.Generic
 open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
+open CompanyName.MyMeetings.BuildingBlocks.Domain
 open FsCheck.Xunit
 open Xunit
 open Xunit
@@ -14,9 +15,7 @@ type Tests (output: ITestOutputHelper) =
 
     [<Fact>]
     let ``empty list to empty dict`` () =
-        let er = {
-            ValidationErrors = []
-        }
+        let er = []
         
         let res = er |> Helpers.toMap
         
@@ -24,11 +23,9 @@ type Tests (output: ITestOutputHelper) =
     
     [<Fact>]
     let ``one validation error to one key in dict`` () =
-        let er = {
-            ValidationErrors = [
-                {Target = "bla"; Message = ["cos"]}
+        let er = [
+                {Target = "bla"; Errors = [Errors.StringError Errors.Empty]}
             ]
-        }
         
         let res = er |> Helpers.toMap
         
@@ -37,11 +34,9 @@ type Tests (output: ITestOutputHelper) =
         
     [<Fact>]
     let ``two validation errors to one key in dict`` () =
-        let er = {
-            ValidationErrors = [
-                {Target = "bla"; Message = ["cos"; "tmp"]}
+        let er = [
+                {Target = "bla"; Errors = [Errors.Empty; Errors.ContainsNewline] |> List.map Errors.StringError}
             ]
-        }
         
         let res = er |> Helpers.toMap
         
@@ -50,12 +45,10 @@ type Tests (output: ITestOutputHelper) =
         
     [<Fact>]
     let ``two validation errors to two keys in dict`` () =
-        let er = {
-            ValidationErrors = [
-                {Target = "bla"; Message = ["cos"; "tmp"]}
-                {Target = "ops"; Message = ["cos2"; "tmp2"]}
+        let er = [
+                {Target = "bla"; Errors = [Errors.Empty; Errors.ContainsNewline] |> List.map Errors.StringError}
+                {Target = "ops"; Errors = [Errors.Empty; Errors.MaxLengthExceeded 5] |> List.map Errors.StringError}
             ]
-        }
         
         let res = er |> Helpers.toMap
         
@@ -69,14 +62,14 @@ type Tests (output: ITestOutputHelper) =
         let s = Map.toSeq m
         let se = seq {
                 for (t, m) in s ->
-                    {Target = t; Message = m}
+                    {Target = t; Errors = m}
             }
         let l = List.ofSeq se
-        let er = {
-            ValidationErrors = l
-        }
+//        let er = {
+//            ValidationErrors = l
+//        }
         
-        let res = er |> Helpers.toMap
+        let res = l |> Helpers.toMap
         
         res.Count |> should equal m.Count
         
