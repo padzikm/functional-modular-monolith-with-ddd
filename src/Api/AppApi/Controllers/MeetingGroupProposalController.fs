@@ -72,9 +72,7 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
             LocationCity = req.LocationCity
             LocationCountryCode = req.LocationCountryCode
         }
-//        let a = this.Url.Action("bla", "meetings")
-//        let al = this.Url.ActionLink("bla", "meetings")
-//        (a, al)
+        
         let q = sendd dispatch cmd
         let u = q |> AsyncResult.foldResult (fun x -> this.Accepted x :> ActionResult) mapError
         u
@@ -87,7 +85,7 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
         let u = q |> AsyncResultOption.map (fun r ->
             match r.CommandStatus with
             | Accepted -> this.Ok() :> ActionResult
-            | Completed rr -> this.Ok({MeetingGroupProposalId = rr.MeetgingGroupProposalId; MeetingGroupProposalLink = this.Url.Action("GetMeetingGroupProposal", "MeetingGroupProposal", rr.MeetgingGroupProposalId)}) :> ActionResult
+            | Completed rr -> this.Ok({MeetingGroupProposalId = rr.MeetgingGroupProposalId; MeetingGroupProposalLink = this.Url.Action("GetMeetingGroupProposal", "MeetingGroupProposal", {|id = rr.MeetgingGroupProposalId|})}) :> ActionResult
             | Rejected str -> this.Ok({Error = str}) :> ActionResult)
 
         let res = u |> AsyncResult.foldResult (fun o -> Option.defaultValue (this.NotFound() :> ActionResult) o) mapError
@@ -95,8 +93,5 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
 
     [<HttpGet("{id}")>]
     member this.GetMeetingGroupProposal(id: Guid) =
-        logger.LogInformation(this.Url.Action("Cos", "Meetings", {|str = id|}))
-        logger.LogInformation(this.Url.Action("ProposeMeetingGroupTask", "MeetingGroupProposal", {|id = id|}))
-        this.Ok("cokolwiek")
-//        this.Ok(this.Url.Action("Cos", "Meetings", id))
-//        this.Ok(this.Url.Action("ProposeMeetingGroupTask", "MeetingGroupProposal", id))
+        this.Ok()
+        

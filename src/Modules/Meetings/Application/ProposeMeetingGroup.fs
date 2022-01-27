@@ -166,6 +166,8 @@ module Types =
     
     type ProposeMeetingGroupCommandResult = {CommandId: Guid; CommandStatus: CommandStatus}
     
+    type ProposeMeetingGroupCommandRequestResult = {CommandId: Guid}
+    
     [<CLIMutable>]
     type ProposeMeetingGroupCommandRequest =
         {
@@ -174,7 +176,7 @@ module Types =
         LocationCity: string
         LocationCountryCode: string
         }
-        interface IRequest<Async<Result<{|CommandId: string|},Error>>> with
+        interface IRequest<Async<Result<ProposeMeetingGroupCommandRequestResult,Error>>> with
         
         
     type ProposeMeetingGroupCommand =

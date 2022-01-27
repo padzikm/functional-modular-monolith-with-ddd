@@ -8,6 +8,7 @@ open System.Linq
 open System.Threading.Tasks
 open CompanyName.MyMeetings.Modules.Meetings.Application.CreateMember.Types
 open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
+open CompanyName.MyMeetings.Modules.Meetings.Interpreters.ProposeMeetingGroup
 open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Data.SqlClient
@@ -39,6 +40,7 @@ module Program =
                 let routing = t.Routing()
                 //let t = typeof<CreateMemberCommand>
                 routing.RouteToEndpoint(typeof<CreateMemberCommand>.Assembly, "Meetings") |> ignore
+                routing.RouteToEndpoint(typeof<ProposeMeetingGroupCommandDto>.Assembly, "Meetings") |> ignore
 //                routing.RouteToEndpoint(typeof<ProposeMeetingGroupCommand>, "Meetings") |> ignore
                 endpoint
                 )
