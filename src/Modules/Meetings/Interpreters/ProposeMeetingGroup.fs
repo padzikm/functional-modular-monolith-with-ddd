@@ -43,6 +43,34 @@ type ProposeMeetingGroupCommandDto =
     MemberId: Guid
     }
     interface ICommand with
+
+type GetProposeMeetingGroupCommandStatusQueryHandler (logger: ILogger<GetProposeMeetingGroupCommandStatusQueryHandler>, dbContext: MeetingsDbContext) =
+    inherit RequestHandler<GetProposeMeetingGroupCommandStatusQuery, Async<Result<ProposeMeetingGroupCommandResult option, Error>>>()
+
+    override this.Handle(request) =
+        let q = dbContext.Commands.SingleOrDefaultAsync(fun c -> c.Id = request.CommandId) |> AsyncResult.ofTask
+        let r = q |> AsyncResult.mapError InfrastructureError
+        let p = r |> AsyncResult.map Option.ofObj
+//        let y = asyncResult{
+//            let! b = p
+//            logger.LogInformation (sprintf "w bind %O" v)
+//            let st = match b.CommandStatus with
+//                | CommandStatus.Accepted -> Accepted
+//                | CommandStatus.Rejected -> Rejected v.Error
+//                | CommandStatus.Completed ->
+//                    
+//                    Completed {|MeetingGroupProposalId = Guid.NewGuid()|}
+//                | _ -> Rejected "sth went wrong"
+//        }
+        let w = p |> AsyncResultOption.map (fun v ->
+            logger.LogInformation (sprintf "w map %O" v)
+            let st = match v.CommandStatus with
+                | CommandStatus.Accepted -> Accepted
+                | CommandStatus.Rejected -> Rejected v.Error
+                | CommandStatus.Completed -> Completed {|MeetingGroupProposalId = Guid.NewGuid()|}
+                | _ -> Rejected "sth went wrong"
+            {CommandId = v.Id; CommandStatus = st})
+        w
         
 type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, dbContext: MeetingsDbContext, msgSession: IMessageSession) =
     inherit RequestHandler<ProposeMeetingGroupCommandRequest, Async<Result<ProposeMeetingGroupCommandRequestResult, Error>>>()

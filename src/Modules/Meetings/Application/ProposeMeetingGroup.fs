@@ -162,7 +162,7 @@ module Types =
     type CommandStatus =
     | Accepted
     | Rejected of string
-    | Completed of {|MeetgingGroupProposalId: Guid|}
+    | Completed of {|MeetingGroupProposalId: Guid|}
     
     type ProposeMeetingGroupCommandResult = {CommandId: Guid; CommandStatus: CommandStatus}
     
