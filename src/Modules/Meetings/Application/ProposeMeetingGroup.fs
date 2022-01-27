@@ -161,9 +161,8 @@ module Types =
     
     type CommandStatus =
     | Accepted
-    | Rejected
-    | Completed of Guid
-    | Failed of string
+    | Rejected of string
+    | Completed of {|MeetgingGroupProposalId: Guid|}
     
     type ProposeMeetingGroupCommandResult = {CommandId: Guid; CommandStatus: CommandStatus}
     
@@ -175,7 +174,7 @@ module Types =
         LocationCity: string
         LocationCountryCode: string
         }
-        interface IRequest<Async<Result<ProposeMeetingGroupCommandResult,Error>>> with
+        interface IRequest<Async<Result<{|CommandId: string|},Error>>> with
         
         
     type ProposeMeetingGroupCommand =
@@ -193,7 +192,7 @@ module Types =
         {
             CommandId: Guid
         }
-        interface IRequest<Async<Validation<ProposeMeetingGroupCommandResult option, Error>>> with
+        interface IRequest<Async<Result<ProposeMeetingGroupCommandResult option, Error>>> with
         
     let createCmd (cmd: ProposeMeetingGroupCommandRequest) (ctx: {|Id: Guid; MemberId: Guid|}) =
         let f n d lc lpc =

@@ -22,6 +22,17 @@ type ProposeMeetingGroupRequest = {
     LocationCountryCode: string
 }
 
+[<CLIMutable>]
+type ProposeMeetingGroupTaskSuccessResponse = {
+    MeetingGroupProposalId: Guid
+    MeetingGroupProposalLink: string
+}
+
+[<CLIMutable>]
+type ProposeMeetingGroupTaskErrorResponse = {
+    Error: string
+}
+
 type InfrastructureErrorResult (ex: exn) =
     inherit ObjectResult(ex)
 
@@ -65,5 +76,23 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
 //        let al = this.Url.ActionLink("bla", "meetings")
 //        (a, al)
         let q = sendd dispatch cmd
-        let u = q |> AsyncResult.foldResult (fun x -> this.Ok x :> ActionResult) mapError
+        let u = q |> AsyncResult.foldResult (fun x -> this.Accepted x :> ActionResult) mapError
         u
+    
+    [<HttpGet("/task/{id}")>]
+    member this.ProposeMeetingGroupTask(id: Guid) =
+        let req: GetProposeMeetingGroupCommandStatusQuery = {CommandId = id}
+        
+        let q = sendd dispatch req
+        let u = q |> AsyncResultOption.map (fun r ->
+            match r.CommandStatus with
+            | Accepted -> this.Ok() :> ActionResult
+            | Completed rr -> this.Ok({MeetingGroupProposalId = rr.MeetgingGroupProposalId; MeetingGroupProposalLink = this.Url.Action("GetMeetingGroupProposal", "MeetingGroupProposal", rr.MeetgingGroupProposalId)}) :> ActionResult
+            | Rejected str -> this.Ok({Error = str}) :> ActionResult)
+
+        let res = u |> AsyncResult.foldResult (fun o -> Option.defaultValue (this.NotFound() :> ActionResult) o) mapError
+        res
+
+    [<HttpGet("{id}")>]
+    member this.GetMeetingGroupProposal(id: Guid) =
+        this.Ok(id)
