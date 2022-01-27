@@ -95,4 +95,8 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
 
     [<HttpGet("{id}")>]
     member this.GetMeetingGroupProposal(id: Guid) =
-        this.Ok(id)
+        logger.LogInformation(this.Url.Action("Cos", "Meetings", {|str = id|}))
+        logger.LogInformation(this.Url.Action("ProposeMeetingGroupTask", "MeetingGroupProposal", {|id = id|}))
+        this.Ok("cokolwiek")
+//        this.Ok(this.Url.Action("Cos", "Meetings", id))
+//        this.Ok(this.Url.Action("ProposeMeetingGroupTask", "MeetingGroupProposal", id))

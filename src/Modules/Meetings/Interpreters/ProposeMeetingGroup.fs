@@ -41,25 +41,25 @@ open NServiceBus.MessageMutator
         }
         interface ICommand with
        
-[<AbstractClass>]
-type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<ProposeMeetingGroupCommandResult, Error>>> and 'b :> ICommand> (logger: ILogger, msgSession: IMessageSession) =
-    inherit RequestHandler<'a, Async<Result<ProposeMeetingGroupCommandResult, Error>>>()
-    
-    default this.Handle(request) =
-        let f (req: 'b) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
-        let v = this.validate request
-        let q = f <!> (this.convertToDto <!> v)
-        async {
-            let s = Result.sequenceAsync q
-            let! r = s
-            let u = r |> Result.mapError CommandValidationError
-            let j = Result.flatten u
-            return j
-        }
-        
-    abstract member validate: 'a -> Result<'a, TargetedValidationError list>
-    
-    abstract member convertToDto: 'a -> 'b
+//[<AbstractClass>]
+//type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<ProposeMeetingGroupCommandResult, Error>>> and 'b :> ICommand> (logger: ILogger, msgSession: IMessageSession) =
+//    inherit RequestHandler<'a, Async<Result<ProposeMeetingGroupCommandResult, Error>>>()
+//    
+//    default this.Handle(request) =
+//        let f (req: 'b) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
+//        let v = this.validate request
+//        let q = f <!> (this.convertToDto <!> v)
+//        async {
+//            let s = Result.sequenceAsync q
+//            let! r = s
+//            let u = r |> Result.mapError CommandValidationError
+//            let j = Result.flatten u
+//            return j
+//        }
+//        
+//    abstract member validate: 'a -> Result<'a, TargetedValidationError list>
+//    
+//    abstract member convertToDto: 'a -> 'b
 
 //type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, msgSession: IMessageSession) =
 //    inherit CommandValidator<ProposeMeetingGroupCommandRequest, ProposeMeetingGroupCommandDto>(logger, msgSession)
@@ -114,91 +114,91 @@ type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<ProposeMeetingGrou
 //                Task.CompletedTask
         
         
-type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, dbContext: MeetingsDbContext) =
-    let rec interpret (p: Program<_>) (ctx:IMessageHandlerContext) =
-        let go v =
-            match v with
-            | InL l ->
-                match l with
-                | InL dbi ->
-                    match dbi with
-                    | SaveMeetingGroupProposal (m, i) ->
-                        logger.LogInformation (sprintf "save member %A" m)
-                        match m with
-                        | InVerificationMeetingGroupProposal up ->
-                            let (MeetingGroupProposalId id) = up.Id
-                            let memb = MeetingGroupProposal(Id = id, Name = MeetingName.value up.Name, Description = Option.defaultValue "" up.Description, ProposalDate = up.ProposalDate,
-                                                            ProposalMemberId = up.ProposalMemberId, LocationCity = MeetingLocationCity.value up.Location.City,
-                                                            LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.InVerification)
-                            async {
-                                let _ = dbContext.MeetingGroupProposals.Add(memb)// |> Async.AwaitTask
-//                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
-                                return i
-                            }
-                        | AcceptedMeetingGroupProposal up ->
-                            let (MeetingGroupProposalId id) = up.Id
-                            let memb = MeetingGroupProposal(Id = id, Name = MeetingName.value up.Name, Description = Option.defaultValue "" up.Description, ProposalDate = up.ProposalDate,
-                                                            ProposalMemberId = up.ProposalMemberId, LocationCity = MeetingLocationCity.value up.Location.City,
-                                                            LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.Accepted)
-                            async {
-                                let _ = dbContext.MeetingGroupProposals.Add(memb)// |> Async.AwaitTask
-//                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
-                                return i
-                            }
-                | InR evi ->
-                    match evi with
-                    | PublishMeetingGroupProposedEvent (eve, i) ->
-                        logger.LogInformation (sprintf "publish member created event %A" eve)
-                        async {
-                            let (MeetingGroupProposalId id) = eve.Id
-                            let ev: MeetingGroupProposedDomainEvent = {
-                                Id = id; Name = MeetingName.value eve.Name; Description = Option.defaultValue "" eve.Description
-                                ProposalUserId = eve.ProposalUserId; ProposalDate = eve.ProposalDate
-                                LocationCity = MeetingLocationCity.value eve.LocationCity; LocationPostcode = MeetingLocationPostcode.value eve.LocationPostcode
-                            }
-                            let! _ = ctx.Publish ev |> Async.AwaitTask
-                            return i
-                        }
-            | InR r ->
-                match r with
-                | LogInfo (s, i) ->
-                    logger.LogInformation (sprintf "log information %A" s)
-                    async {
-                        return i
-                    }
-        Free.fold go p
-        
-    interface IHandleMessages<ProposeMeetingGroupCommandDto> with
-        member this.Handle(message, context) =
-            async {                
-                let r = result{
-                    logger.LogInformation "message received"
-                    logger.LogInformation (sprintf "%A" message)
-                    let c = { Name = message.Name
-                              Description = message.Description
-                              LocationCity = message.LocationCity
-                              LocationCountryCode = message.LocationCountryCode }
-                    
-                    let! msgInternal = createCmd c {|Id = Guid.NewGuid(); MemberId = Guid.NewGuid()|}
-                    let program = handler msgInternal DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
-                    return interpret program context
-                }
-                let a = Result.sequenceAsync r
-                let! b = a
-                match b with
-                | Ok v -> 
-//                    logger.LogInformation (sprintf "interpret result %A" result)
-                    logger.LogInformation "message handled"
-                    return v
-                | Error err ->
-                    logger.LogInformation "message validation failed"
-                    failwith (sprintf "%O" err)
-                
-//                let program = handler message DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
-                
-//                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
-                
-            } |> Async.StartAsTask :> Task
+//type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, dbContext: MeetingsDbContext) =
+//    let rec interpret (p: Program<_>) (ctx:IMessageHandlerContext) =
+//        let go v =
+//            match v with
+//            | InL l ->
+//                match l with
+//                | InL dbi ->
+//                    match dbi with
+//                    | SaveMeetingGroupProposal (m, i) ->
+//                        logger.LogInformation (sprintf "save member %A" m)
+//                        match m with
+//                        | InVerificationMeetingGroupProposal up ->
+//                            let (MeetingGroupProposalId id) = up.Id
+//                            let memb = MeetingGroupProposal(Id = id, Name = MeetingName.value up.Name, Description = Option.defaultValue "" up.Description, ProposalDate = up.ProposalDate,
+//                                                            ProposalMemberId = up.ProposalMemberId, LocationCity = MeetingLocationCity.value up.Location.City,
+//                                                            LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.InVerification)
+//                            async {
+//                                let _ = dbContext.MeetingGroupProposals.Add(memb)// |> Async.AwaitTask
+////                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+//                                return i
+//                            }
+//                        | AcceptedMeetingGroupProposal up ->
+//                            let (MeetingGroupProposalId id) = up.Id
+//                            let memb = MeetingGroupProposal(Id = id, Name = MeetingName.value up.Name, Description = Option.defaultValue "" up.Description, ProposalDate = up.ProposalDate,
+//                                                            ProposalMemberId = up.ProposalMemberId, LocationCity = MeetingLocationCity.value up.Location.City,
+//                                                            LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.Accepted)
+//                            async {
+//                                let _ = dbContext.MeetingGroupProposals.Add(memb)// |> Async.AwaitTask
+////                            let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+//                                return i
+//                            }
+//                | InR evi ->
+//                    match evi with
+//                    | PublishMeetingGroupProposedEvent (eve, i) ->
+//                        logger.LogInformation (sprintf "publish member created event %A" eve)
+//                        async {
+//                            let (MeetingGroupProposalId id) = eve.Id
+//                            let ev: MeetingGroupProposedDomainEvent = {
+//                                Id = id; Name = MeetingName.value eve.Name; Description = Option.defaultValue "" eve.Description
+//                                ProposalUserId = eve.ProposalUserId; ProposalDate = eve.ProposalDate
+//                                LocationCity = MeetingLocationCity.value eve.LocationCity; LocationPostcode = MeetingLocationPostcode.value eve.LocationPostcode
+//                            }
+//                            let! _ = ctx.Publish ev |> Async.AwaitTask
+//                            return i
+//                        }
+//            | InR r ->
+//                match r with
+//                | LogInfo (s, i) ->
+//                    logger.LogInformation (sprintf "log information %A" s)
+//                    async {
+//                        return i
+//                    }
+//        Free.fold go p
+//        
+//    interface IHandleMessages<ProposeMeetingGroupCommandDto> with
+//        member this.Handle(message, context) =
+//            async {                
+//                let r = result{
+//                    logger.LogInformation "message received"
+//                    logger.LogInformation (sprintf "%A" message)
+//                    let c = { Name = message.Name
+//                              Description = message.Description
+//                              LocationCity = message.LocationCity
+//                              LocationCountryCode = message.LocationCountryCode }
+//                    
+//                    let! msgInternal = createCmd c {|Id = Guid.NewGuid(); MemberId = Guid.NewGuid()|}
+//                    let program = handler msgInternal DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
+//                    return interpret program context
+//                }
+//                let a = Result.sequenceAsync r
+//                let! b = a
+//                match b with
+//                | Ok v -> 
+////                    logger.LogInformation (sprintf "interpret result %A" result)
+//                    logger.LogInformation "message handled"
+//                    return v
+//                | Error err ->
+//                    logger.LogInformation "message validation failed"
+//                    failwith (sprintf "%O" err)
+//                
+////                let program = handler message DateTime.UtcNow (Guid.NewGuid()) (Guid.NewGuid())
+//                
+////                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
+//                
+//            } |> Async.StartAsTask :> Task
             
 //    interface IHandleMessages<ProposeMeetingGroupCommandInternal> with
 //        member this.Handle(message, context) =
