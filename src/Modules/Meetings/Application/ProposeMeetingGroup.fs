@@ -4,6 +4,7 @@ open System
 open System
 open CompanyName.MyMeetings.BuildingBlocks.Application.Errors
 open CompanyName.MyMeetings.BuildingBlocks.Domain.Errors
+//open CompanyName.MyMeetings.Modules.Meetings.Application.ProposeMeetingGroup.Types
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open CompanyName.MyMeetings.Modules.Meetings.Domain.DomainEvents
 open CompanyName.MyMeetings.Modules.Meetings.Domain.SimpleTypes
@@ -158,30 +159,45 @@ module Statee =
 module Types =
     open CompanyName.MyMeetings.BuildingBlocks
     
+    type CommandStatus =
+    | Accepted
+    | Rejected
+    | Completed of Guid
+    | Failed of string
+    
+    type ProposeMeetingGroupCommandResult = {CommandId: Guid; CommandStatus: CommandStatus}
+    
     [<CLIMutable>]
-    type ProposeMeetingGroupCommand =
+    type ProposeMeetingGroupCommandRequest =
         {
         Name: string
         Description: string
         LocationCity: string
         LocationCountryCode: string
         }
-        interface IRequest<Async<Result<unit,Error>>> with
+        interface IRequest<Async<Result<ProposeMeetingGroupCommandResult,Error>>> with
         
         
-    type ProposeMeetingGroupCommandInternal =
+    type ProposeMeetingGroupCommand =
             {
-            Id: Guid
+            CommandId: Guid
             Name: MeetingName
             Description: string option
             LocationCity: MeetingLocationCity
             LocationPostcode: MeetingLocationPostcode
             MemberId: Guid
+            DateTime: DateTime
             }
         
-    let createCmd (cmd: ProposeMeetingGroupCommand) (ctx: {|Id: Guid; MemberId: Guid|}) =
+    type GetProposeMeetingGroupCommandStatusQuery =
+        {
+            CommandId: Guid
+        }
+        interface IRequest<Async<Validation<ProposeMeetingGroupCommandResult option, Error>>> with
+        
+    let createCmd (cmd: ProposeMeetingGroupCommandRequest) (ctx: {|Id: Guid; MemberId: Guid|}) =
         let f n d lc lpc =
-            {Name = n; Description = d; LocationCity = lc; LocationPostcode = lpc; Id = ctx.Id; MemberId = ctx.MemberId}
+            {Name = n; Description = d; LocationCity = lc; LocationPostcode = lpc; CommandId = ctx.Id; MemberId = ctx.MemberId; DateTime = DateTime.UtcNow}
         
         f
         <!^> (MeetingName.create cmd.Name |> Result.mapError (fun er -> {Target = nameof cmd.Name; Errors = er }))
@@ -190,14 +206,52 @@ module Types =
         <*^> (MeetingLocationPostcode.create cmd.LocationCountryCode |> Result.mapError (fun er -> {Target = nameof cmd.LocationCountryCode; Errors = er }))
 
 module Algebra =
+    open Types
+    
+    type DateTime<'A> =
+        | GetCurrentDateTime of (DateTime -> 'A)
+        
+        static member Map((GetCurrentDateTime (g)), f: 'A -> 'B) =
+            GetCurrentDateTime (g >> f)
+    
+    type UuidGenerator<'A> =
+        | GenerateUuid of (Guid -> 'A)
+        
+        static member Map((GenerateUuid (g)), f: 'A -> 'B) =
+            GenerateUuid (g >> f)
+    
+    type LoggedInUser<'A> =
+        | GetLoggedInUserId of (Guid -> 'A)
+        
+        static member Map(x: LoggedInUser<'A>, f: 'A -> 'B) =
+            let (GetLoggedInUserId g) = x
+            GetLoggedInUserId (g >> f)
+            
+    type CommandProcessor<'A> =
+        | ProcessCommand of ProposeMeetingGroupCommand * 'A
+        
+        static member Map((ProcessCommand (c, a)), f: 'A -> 'B) =
+            ProcessCommand (c, f a)
     
     type DatabaseInstruction<'A> =
+        | MarkCommandAsAccepted of Guid * 'A
+        | MarkCommandAsRejected of Guid * TargetedValidationError list * 'A
+        | MarkCommandAsCompleted of Guid * 'A
+        | MarkCommandAsFailed of Guid * string * 'A
         | SaveMeetingGroupProposal of MeetingGroupProposal * 'A
         
-    type DatabaseInstruction<'A> with
         static member Map(x: DatabaseInstruction<'A>, f: 'A -> 'B) =
             match x with
             | SaveMeetingGroupProposal (m, a) -> SaveMeetingGroupProposal(m, f a)
+            | MarkCommandAsAccepted (m, a) -> MarkCommandAsAccepted(m, f a)
+            | MarkCommandAsCompleted (m, a) -> MarkCommandAsCompleted(m, f a)
+            | MarkCommandAsRejected (m, e, a) -> MarkCommandAsRejected(m, e, f a)
+            | MarkCommandAsFailed (m, e, a) -> MarkCommandAsFailed(m, e, f a)
+        
+//    type DatabaseInstruction<'A> with
+//        member _.Map(x: DatabaseInstruction<'A>, f: 'A -> 'B) =
+//            match x with
+//            | SaveMeetingGroupProposal (m, a) -> SaveMeetingGroupProposal(m, f a)
             
     type DomainEventInstruction<'A> =
         | PublishMeetingGroupProposedEvent of e: MeetingGroupProposedDomainEventInternal * 'A
@@ -215,16 +269,29 @@ module Algebra =
             match x with
             | LogInfo (s, a) -> LogInfo(s, f a)
             
-    type FreeStructure<'A> = Coproduct<Coproduct<DatabaseInstruction<'A>, DomainEventInstruction<'A>>, LoggingInstruction<'A>>
+    type FreeStructure<'A> = Coproduct<
+        Coproduct<
+            CommandProcessor<'A>, Coproduct<DatabaseInstruction<'A>, DomainEventInstruction<'A>>>,
+        Coproduct<
+            Coproduct<LoggingInstruction<'A>, LoggedInUser<'A>>, Coproduct<UuidGenerator<'A>, DateTime<'A>>>>
     type Program<'A> = Free<FreeStructure<'A>, 'A>
 
 module Implementation =
     open Algebra
     open Types
     
-    let saveMeetingGroupProposal m: Program<_> = SaveMeetingGroupProposal(m, ()) |> (Free.liftF << InL << InL)
-    let publishProposedMeetingGroupEvent e: Program<_> = PublishMeetingGroupProposedEvent(e, ()) |> (Free.liftF << InL << InR)
-    let logInfo s: Program<_> = LogInfo(s, ()) |> (Free.liftF << InR)
+    let processCmd cmd: Program<_> = ProcessCommand(cmd, ()) |> (Free.liftF << InL << InL)
+    let saveMeetingGroupProposal m: Program<_> = SaveMeetingGroupProposal(m, ()) |> (Free.liftF << InL << InR << InL)
+    let markCommandAsAccepted m: Program<_> = MarkCommandAsAccepted(m, ()) |> (Free.liftF << InL << InR << InL)
+    let markCommandAsRejected m e: Program<_> = MarkCommandAsRejected(m, e, ()) |> (Free.liftF << InL << InR << InL)
+    let markCommandAsCompleted m: Program<_> = MarkCommandAsCompleted(m, ()) |> (Free.liftF << InL << InR << InL)
+    let markCommandAsFailed m e: Program<_> = MarkCommandAsFailed(m, e, ()) |> (Free.liftF << InL << InR << InL)
+    let publishProposedMeetingGroupEvent e: Program<_> = PublishMeetingGroupProposedEvent(e, ()) |> (Free.liftF << InL << InR << InR)
+    let logInfo s: Program<_> = LogInfo(s, ()) |> (Free.liftF << InR << InL << InL)
+    let getLoggedInUserId: Program<_> = GetLoggedInUserId(id) |> (Free.liftF << InR << InL << InR)
+    let generateUuid: Program<_> = GenerateUuid(id) |> (Free.liftF << InR << InR << InL)
+    let getCurrentDateTime: Program<_> = GetCurrentDateTime(id) |> (Free.liftF << InR << InR << InR)
+    
     
 //    let validate2 (cmd: ProposeMeetingGroupCommand) =
 //        let n = Result.requireNotNull {Target = nameof cmd.Name; Message = ["must be not null"]} cmd.Name
@@ -243,17 +310,53 @@ module Implementation =
 //        let c = createCmd cmd
         let t = Validation.ok cmd
         t
+        
+    let createCmd2 (cmd: ProposeMeetingGroupCommandRequest) (ctx: {|CommandId: Guid; MemberId: Guid; dt: DateTime|}) =
+        let f n d lc lpc =
+            {Name = n; Description = d; LocationCity = lc; LocationPostcode = lpc; CommandId = ctx.CommandId; MemberId = ctx.MemberId; DateTime = ctx.dt}
+        
+        f
+        <!^> (MeetingName.create cmd.Name |> Result.mapError (fun er -> {Target = nameof cmd.Name; Errors = er }))
+        <*^> Ok (if cmd.Description = null then None else Some cmd.Description)
+        <*^> (MeetingLocationCity.create cmd.LocationCity |> Result.mapError (fun er -> {Target = nameof cmd.LocationCity; Errors = er }))
+        <*^> (MeetingLocationPostcode.create cmd.LocationCountryCode |> Result.mapError (fun er -> {Target = nameof cmd.LocationCountryCode; Errors = er }))
+        
+    let handleCmdRequest (req: ProposeMeetingGroupCommandRequest) = monad{
+        do! logInfo (sprintf "received cmd req: %O" req)
+        let! uuid = generateUuid
+        do! logInfo (sprintf "uuid: %O" uuid)
+        let! dt = getCurrentDateTime
+        do! logInfo (sprintf "datetime: %O" dt)
+        let! u = getLoggedInUserId
+        do! logInfo (sprintf "userid: %O" u)
+        let c = createCmd2 req {|CommandId = uuid; MemberId = u; dt = dt|}
+        let! _ = match c with
+        | Ok cmd -> monad{
+                do! logInfo (sprintf "cmd accepted %O" cmd)
+                do! markCommandAsAccepted uuid
+                do! processCmd cmd
+            }
+        | Error errs -> markCommandAsRejected uuid errs
+        do! logInfo "request processed"
+//        let b = monad{
+//            let! c = createCmd2 req {|CommandId = uuid; MemberId = u; dt = dt|}
+//            let! m = Result.Ok (monad{
+//                do! markCommandAsAccepted uuid
+//            })
+//            return c
+//        }
+        return c
+    }
     
-    let handler (cmd: ProposeMeetingGroupCommandInternal) now g1 g2 = monad {
+    let handler (cmd: ProposeMeetingGroupCommand)= monad {
+        let! g1 = generateUuid
         let mgid = MeetingGroupProposalId g1
-        let uid = g2
-        let pd = now
         let m: MeetingGroupProposal = InVerificationMeetingGroupProposal({
             Id = mgid
             Name = cmd.Name
             Description = cmd.Description     
-            ProposalDate = pd
-            ProposalMemberId = uid
+            ProposalDate = cmd.DateTime
+            ProposalMemberId = cmd.MemberId
             Location = {
                 City = cmd.LocationCity
                 Postcode = cmd.LocationPostcode
@@ -264,12 +367,14 @@ module Implementation =
             Id = mgid
             Name = cmd.Name
             Description = cmd.Description
-            ProposalUserId = uid
-            ProposalDate = pd
+            ProposalUserId = cmd.MemberId
+            ProposalDate = cmd.DateTime
             LocationCity = cmd.LocationCity
             LocationPostcode = cmd.LocationPostcode
         }
         do! logInfo "meeting group proposal created!"
         do! publishProposedMeetingGroupEvent e
         do! logInfo "meeting group proposed event sent"
+        do! markCommandAsCompleted cmd.CommandId
+        do! logInfo "command completed"
     }

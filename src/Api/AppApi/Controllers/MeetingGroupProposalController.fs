@@ -55,13 +55,15 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
             
     [<HttpPost>]
     member this.ProposeMeetingGroup(req: ProposeMeetingGroupRequest) =
-        let cmd: ProposeMeetingGroupCommand = {
+        let cmd: ProposeMeetingGroupCommandRequest = {
             Name = req.Name
             Description = req.Description
             LocationCity = req.LocationCity
             LocationCountryCode = req.LocationCountryCode
         }
-        
+//        let a = this.Url.Action("bla", "meetings")
+//        let al = this.Url.ActionLink("bla", "meetings")
+//        (a, al)
         let q = sendd dispatch cmd
         let u = q |> AsyncResult.foldResult (fun x -> this.Ok x :> ActionResult) mapError
         u

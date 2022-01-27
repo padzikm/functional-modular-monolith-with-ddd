@@ -42,8 +42,8 @@ open NServiceBus.MessageMutator
         interface ICommand with
        
 [<AbstractClass>]
-type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<unit, Error>>> and 'b :> ICommand> (logger: ILogger, msgSession: IMessageSession) =
-    inherit RequestHandler<'a, Async<Result<unit, Error>>>()
+type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<ProposeMeetingGroupCommandResult, Error>>> and 'b :> ICommand> (logger: ILogger, msgSession: IMessageSession) =
+    inherit RequestHandler<'a, Async<Result<ProposeMeetingGroupCommandResult, Error>>>()
     
     default this.Handle(request) =
         let f (req: 'b) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
@@ -61,8 +61,8 @@ type CommandValidator<'a, 'b when 'a :> IRequest<Async<Result<unit, Error>>> and
     
     abstract member convertToDto: 'a -> 'b
 
-type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, msgSession: IMessageSession) =
-    inherit CommandValidator<ProposeMeetingGroupCommand, ProposeMeetingGroupCommandDto>(logger, msgSession)
+//type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, msgSession: IMessageSession) =
+//    inherit CommandValidator<ProposeMeetingGroupCommandRequest, ProposeMeetingGroupCommandDto>(logger, msgSession)
 
 //    default this.Handle(request) =
 //        let f (req: ProposeMeetingGroupCommand) = AsyncResult.ofTaskAction (msgSession.Send req) |> AsyncResult.mapError InfrastructureError
@@ -76,20 +76,20 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
 //            return j
 //        }
 
-    override this.validate a =
-        let c = createCmd a {|Id = Guid.NewGuid(); MemberId = Guid.NewGuid()|}
-        (fun _ -> a) <!> c
-        
-    override this.convertToDto b =
-        let c = {
-            Id = Guid.NewGuid()
-            Name = b.Name
-            Description = b.Description
-            LocationCity = b.LocationCity
-            LocationCountryCode = b.LocationCountryCode
-            MemberId = Guid.NewGuid()
-        }
-        c
+//    override this.validate a =
+//        let c = createCmd a {|Id = Guid.NewGuid(); MemberId = Guid.NewGuid()|}
+//        (fun _ -> a) <!> c
+//        
+//    override this.convertToDto b =
+//        let c = {
+//            Id = Guid.NewGuid()
+//            Name = b.Name
+//            Description = b.Description
+//            LocationCity = b.LocationCity
+//            LocationCountryCode = b.LocationCountryCode
+//            MemberId = Guid.NewGuid()
+//        }
+//        c
 
 //type ProposeMeetingGroupCmdMutator() =
 //    interface IMutateIncomingMessages with
@@ -168,7 +168,7 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                     }
         Free.fold go p
         
-    interface IHandleMessages<ProposeMeetingGroupCommand> with
+    interface IHandleMessages<ProposeMeetingGroupCommandDto> with
         member this.Handle(message, context) =
             async {                
                 let r = result{
