@@ -23,6 +23,7 @@ open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Logging
 open NServiceBus
 open FsToolkit.ErrorHandling.Operator.Validation
+open FsToolkit.ErrorHandling
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open NServiceBus.Logging
 open NServiceBus.MessageMutator
@@ -51,26 +52,39 @@ type GetProposeMeetingGroupCommandStatusQueryHandler (logger: ILogger<GetPropose
         let q = dbContext.Commands.SingleOrDefaultAsync(fun c -> c.Id = request.CommandId) |> AsyncResult.ofTask
         let r = q |> AsyncResult.mapError InfrastructureError
         let p = r |> AsyncResult.map Option.ofObj
-//        let y = asyncResult{
-//            let! b = p
-//            logger.LogInformation (sprintf "w bind %O" v)
-//            let st = match b.CommandStatus with
+        let y = asyncResult{
+            let! b = p
+            let res = match b with
+                | None -> None |> AsyncResult.retn
+                | Some v ->
+                    logger.LogInformation (sprintf "w bind %O" v)
+                    match v.CommandStatus with
+                        | CommandStatus.Accepted -> {CommandId = request.CommandId; CommandStatus = Accepted} |> AsyncResultOption.retn
+                        | CommandStatus.Rejected -> {CommandId = request.CommandId; CommandStatus = Rejected v.Error} |> AsyncResultOption.retn
+                        | CommandStatus.Completed ->
+                            let qq = dbContext.MeetingGroupProposals.SingleOrDefaultAsync(fun c -> c.CreatedByCmdId = request.CommandId) |> AsyncResult.ofTask
+                            let qe = qq |> AsyncResult.mapError InfrastructureError
+                            let qm = qe |> AsyncResult.map (fun x ->
+                                if x <> null then
+                                    {CommandId = request.CommandId; CommandStatus = Completed {|MeetingGroupProposalId = x.Id|}}
+                                else
+                                    {CommandId = request.CommandId; CommandStatus = Accepted}
+                                )
+                            let qo = qm |> AsyncResult.map Some
+                            qo
+                        | _ -> {CommandId = request.CommandId; CommandStatus = Rejected "sth went wrong"} |> AsyncResultOption.retn
+            return! res
+        }
+        y
+//        let w = p |> AsyncResultOption.map (fun v ->
+//            logger.LogInformation (sprintf "w map %O" v)
+//            let st = match v.CommandStatus with
 //                | CommandStatus.Accepted -> Accepted
 //                | CommandStatus.Rejected -> Rejected v.Error
-//                | CommandStatus.Completed ->
-//                    
-//                    Completed {|MeetingGroupProposalId = Guid.NewGuid()|}
+//                | CommandStatus.Completed -> Completed {|MeetingGroupProposalId = Guid.NewGuid()|}
 //                | _ -> Rejected "sth went wrong"
-//        }
-        let w = p |> AsyncResultOption.map (fun v ->
-            logger.LogInformation (sprintf "w map %O" v)
-            let st = match v.CommandStatus with
-                | CommandStatus.Accepted -> Accepted
-                | CommandStatus.Rejected -> Rejected v.Error
-                | CommandStatus.Completed -> Completed {|MeetingGroupProposalId = Guid.NewGuid()|}
-                | _ -> Rejected "sth went wrong"
-            {CommandId = v.Id; CommandStatus = st})
-        w
+//            {CommandId = v.Id; CommandStatus = st})
+//        w
         
 type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCommandValidator>, dbContext: MeetingsDbContext, msgSession: IMessageSession) =
     inherit RequestHandler<ProposeMeetingGroupCommandRequest, Async<Result<ProposeMeetingGroupCommandRequestResult, Error>>>()
@@ -103,7 +117,8 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
                                 let (MeetingGroupProposalId id) = up.Id
                                 let memb = MeetingGroupProposal(Id = id, Name = MeetingName.value up.Name, Description = Option.defaultValue "" up.Description, ProposalDate = up.ProposalDate,
                                                                 ProposalMemberId = up.ProposalMemberId, LocationCity = MeetingLocationCity.value up.Location.City,
-                                                                LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.InVerification)
+                                                                LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.InVerification
+                                                                )
                                 async {
                                     let _ = dbContext.MeetingGroupProposals.Add(memb)// |> Async.AwaitTask
 //                                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask
@@ -113,7 +128,8 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
                                 let (MeetingGroupProposalId id) = up.Id
                                 let memb = MeetingGroupProposal(Id = id, Name = MeetingName.value up.Name, Description = Option.defaultValue "" up.Description, ProposalDate = up.ProposalDate,
                                                                 ProposalMemberId = up.ProposalMemberId, LocationCity = MeetingLocationCity.value up.Location.City,
-                                                                LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.Accepted)
+                                                                LocationCountryCode = MeetingLocationPostcode.value up.Location.Postcode, Status = MeetingGroupProposalStatus.Accepted
+                                                                )
                                 async {
                                     let _ = dbContext.MeetingGroupProposals.Add(memb)// |> Async.AwaitTask
 //                                let! _ = dbContext.SaveChangesAsync() |> Async.AwaitTask

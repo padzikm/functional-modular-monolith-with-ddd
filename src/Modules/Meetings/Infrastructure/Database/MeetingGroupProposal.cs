@@ -12,6 +12,7 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Database
     public class MeetingGroupProposal
     {
         public Guid Id { get; set; }
+        public Guid CreatedByCmdId {get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public Guid ProposalMemberId { get; set; }

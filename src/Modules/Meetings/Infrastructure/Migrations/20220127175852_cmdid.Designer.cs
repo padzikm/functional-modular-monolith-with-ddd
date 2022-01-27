@@ -4,14 +4,16 @@ using CompanyName.MyMeetings.Modules.Meetings.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CompanyName.MyMeetings.Modules.Meetings.Infrastructure.Migrations
 {
     [DbContext(typeof(MeetingsDbContext))]
-    partial class MeetingsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220127175852_cmdid")]
+    partial class cmdid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

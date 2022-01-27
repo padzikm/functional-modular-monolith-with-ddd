@@ -85,7 +85,7 @@ type MeetingGroupProposalController (logger: ILogger<MeetingGroupProposalControl
         let u = q |> AsyncResultOption.map (fun r ->
             logger.LogInformation (sprintf "%O" r)
             match r.CommandStatus with
-            | Accepted -> this.Ok() :> ActionResult
+            | Accepted -> this.Ok("accepted") :> ActionResult
             | Completed rr -> this.Ok({MeetingGroupProposalId = rr.MeetingGroupProposalId; MeetingGroupProposalLink = this.Url.Action("GetMeetingGroupProposal", "MeetingGroupProposal", {|id = rr.MeetingGroupProposalId|})}) :> ActionResult
             | Rejected str -> this.Ok({Error = str}) :> ActionResult)
 
