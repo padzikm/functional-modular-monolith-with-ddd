@@ -16,6 +16,7 @@ open FSharpPlus
 open FSharpPlus
 open FSharpPlus.Data
 open FsToolkit.ErrorHandling
+open FsToolkit.ErrorHandling.Operator.AsyncResult
 open FsToolkit.ErrorHandling.Operator.Result
 open MediatR
 open Microsoft.Extensions.Logging
@@ -25,6 +26,7 @@ open FsToolkit.ErrorHandling.Operator.Validation
 open CompanyName.MyMeetings.Modules.Meetings.Domain
 open NServiceBus.Logging
 open NServiceBus.MessageMutator
+open Microsoft.EntityFrameworkCore
 
 //type ProposeMeetingGroupCommandSender (logger: ILogger<ProposeMeetingGroupCommandSender>, msgSession: IMessageSession) =
 //    inherit RequestHandler<ProposeMeetingGroupCommandInternal, Async<unit>>()
@@ -91,11 +93,15 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
                                 }
                         | MarkCommandAsAccepted (g, i) ->
                             async{
-                                
+                                let cmd = Command(Id = g, DateTime = DateTime.UtcNow, CommandStatus = CommandStatus.Accepted)
+                                let _ = dbContext.Commands.Add cmd
                                 return i
                             }
                         | MarkCommandAsRejected (g, v, i) ->
                             async{
+                                let er = sprintf "%O" v
+                                let cmd = Command(Id = g, DateTime = DateTime.UtcNow, CommandStatus = CommandStatus.Rejected, Error = er)
+                                let _ = dbContext.Commands.Add cmd
                                 return i
                             }
                         | MarkCommandAsCompleted (g, i) ->
@@ -170,7 +176,16 @@ type ProposeMeetingGroupCommandValidator (logger: ILogger<ProposeMeetingGroupCom
         let cr = c |> Async.map Result.ofChoice
         let crer = cr |> AsyncResult.mapError InfrastructureError
         let cs = crer |> AsyncResult.foldResult id Error
-        cs
+        let o = asyncResult{
+            let! r = cs
+            let! _ = dbContext.SaveChangesAsync() |> AsyncResult.ofTask |> AsyncResult.mapError InfrastructureError
+//            let scer = sc |> AsyncResult.mapError InfrastructureError
+//            let scer = sc |> Result.mapError InfrastructureError
+//            let z = Result.map2 (fun res _ -> res) r scer
+            return r
+        }
+        o
+//        cs
         //imp
 
 //[<AbstractClass>]
@@ -295,6 +310,9 @@ type ProposeMeetingGroupHandler (logger: ILogger<ProposeMeetingGroupHandler>, db
                             }
                         | MarkCommandAsCompleted (g, i) ->
                             async{
+                                let! cm = dbContext.Commands.SingleAsync(fun c -> c.Id = g) |> Async.AwaitTask
+                                cm.CommandStatus <- CommandStatus.Completed
+//                                let _ = dbContext.Commands.Add cmd
                                 return i
                             }
                         | MarkCommandAsFailed (g, s, i) ->

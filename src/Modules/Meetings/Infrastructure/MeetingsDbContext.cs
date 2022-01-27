@@ -8,6 +8,8 @@ namespace CompanyName.MyMeetings.Modules.Meetings.Infrastructure
         public DbSet<Member> Members { get; set; }
         
         public DbSet<MeetingGroupProposal> MeetingGroupProposals { get; set; }
+        
+        public DbSet<Command> Commands { get; set; }
 
         public MeetingsDbContext(DbContextOptions options) : base(options)
         {
